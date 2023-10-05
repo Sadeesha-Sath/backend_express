@@ -30,10 +30,15 @@ const findUserIDfromTransactionID = async (transactionID) => {
   return result[0];
 };
 
-// TODO Look into how to do the integrity checks
 const addTransaction = async (data) => {
   const result = await escapedQuery({
-    sql: `INSERT INTO Transaction (transactionID, fromAccNo, toAccNo, amount, type,  description) VALUES (NULL, ?, ?, ?, ?, ?);`,
+    sql: `
+        START TRANSACTION;
+        declare message varchar(100);
+        call add_trn(?, ?, ?, ?, ?, @message);
+        select @message;
+        COMMIT;
+        `,
     values: [
       data.FromAccNo,
       data.ToAccNo,
@@ -47,4 +52,4 @@ const addTransaction = async (data) => {
 };
 
 
-module.exports = { findAll, findOwn, findOne, findUserIDfromTransactionID };
+module.exports = { findAll, findOwn, findOne, findUserIDfromTransactionID, addTransaction };
