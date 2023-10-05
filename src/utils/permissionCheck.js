@@ -16,7 +16,16 @@ const permissions = {
     "ADD_CUSTOMER",
     "ADD_TRANSACTION",
   ],
-  branch_manager: ["ALL_EMPLOYEES", "ADD_EMPLOYEE", "ADD_CUSTOMER"],
+  branch_manager: [
+    "ALL_USERS",
+    "ALL_EMPLOYEES",
+    "ALL_CUSTOMERS",
+    "ALL_TRANSACTIONS",
+    "ADD_EMPLOYEE",
+    "ADD_CUSTOMER",
+    "ADD_TRANSACTION",
+  ],
+  customer: [],
 };
 
 const permissionCheck = (access, user) => {

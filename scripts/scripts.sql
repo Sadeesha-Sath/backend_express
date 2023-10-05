@@ -1,5 +1,6 @@
-CREATE DATABASE BANKING;
-USE BANKING;
+DROP DATABASE IF EXISTS BANKING_SYSTEM;
+CREATE DATABASE BANKING_SYSTEM;
+USE BANKING_SYSTEM;
 create table User (
     userID varchar(30) NOT NULL,
     name varchar(100),
@@ -103,56 +104,6 @@ create table Transaction (
     FOREIGN KEY (toAccNo) references Account(accountNo),
     FOREIGN KEY (fromAccNo) references Account(accountNo)
 );
-
-CREATE TABLE FixedDeposit (
-  FixedId varchar(10),
-  AccountNo varchar(10),
-  Duration decimal(2) check (Duration in (6, 12, 18)),
-  StartDate date,
-  LastDeptDate date,
-  InterestRate decimal(5,2),
-  customerID varchar(30),
-  PRIMARY KEY (FixedId),
-  FOREIGN KEY (AccountNo) REFERENCES Account(AccountNO), 
-  FOREIGN KEY (customerID) REFERENCES Customer(customerID)
-);
-
-CREATE TABLE LoanApplication (
-  LoanApplicationID varchar(10),
-  CustomerID varchar(10),
-  BranchID varchar(10),
-  Type varchar(15) check (Type in ('Business', 'Personal')),
-  ApplicationDate date,
-  Status varchar(10),
-  PRIMARY KEY (LoanApplicationID), 
-  FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
-  FOREIGN KEY (BranchID) REFERENCES Branch(BranchID)
-
-);
-
-
-CREATE TABLE Loan (
-  LoanID varchar(10) NOT NULL,
-  customerID varchar(30),
-  LoanApplicationID varchar(10),
-  Amount decimal(15,2),
-  StartDate date,
-  EndDate date,
-  Installment decimal(15,2),
-  PRIMARY KEY (LoanID), 
-  FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
-  FOREIGN KEY (LoanApplicationID) REFERENCES LoanApplication(LoanApplicationID)
-);
-
-CREATE TABLE OnlineLoan (
-  OnlineLoanID varchar(15) NOT NULL,
-  LoanID varchar(10),
-  FixedId varchar(10),
-  PRIMARY KEY (OnlineLoanID),
-  FOREIGN KEY (LoanID) REFERENCES Loan(LoanID), 
-  FOREIGN KEY (FixedId) REFERENCES FixedDeposit(FixedId)
-);
-
 
 
 
