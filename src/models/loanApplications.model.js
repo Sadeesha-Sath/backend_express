@@ -14,9 +14,10 @@ const findAll = async (BranchID) => {
 };
 
 const findOne = async (id) => {
-  const result = await query(
-    `SELECT * from LoanApplication where LoanApplicationID=${id}`
-  );
+  const result = await query({
+    sql: `SELECT * from LoanApplication where LoanApplicationID=?`,
+    values: [id],
+  });
   console.log(result[0]);
   return result[0];
 };
@@ -40,9 +41,10 @@ const rejectLoanApplication = async (id, userID) => {
 };
 
 const getBranchIDfromLoanApplication = async (loanApplicationID) => {
-  const result = await query(
-    `SELECT BranchID from LoanApplication where LoanApplicationID=${loanApplicationID}`
-  );
+  const result = await escapedQuery({
+    sql: `SELECT BranchID from LoanApplication where LoanApplicationID=?`,
+    values: [loanApplicationID],
+  });
   console.log(result[0]);
   return result[0];
 };

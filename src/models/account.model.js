@@ -22,13 +22,14 @@ const findOne = async (id) => {
   return result[0];
 };
 
-const findOwn = async (userID) => {
-  const result = await query({
+const findfromUser = async (userID) => {
+  const result = await escapedQuery({
       sql: `SELECT * FROM get_own_account(?)`,
       values: [userID],
   });
-  console.log(result[0]);
-  return result[0];
+  console.log(result);
+  return result;
 };
 
 
+module.exports = { findAll, findOne, findfromUser };

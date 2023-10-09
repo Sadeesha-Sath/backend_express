@@ -7,16 +7,22 @@ const findAll = async () => {
 };
 
 const findOne = async (id) => {
-  const result = await query(`SELECT * from Branch where BranchID=${id}`);
+  const result = await escapedQuery({
+    sql: `SELECT * from Branch where BranchID=?`,
+    values: [id],
+  });
   console.log(result[0]);
   return result[0];
-}
+};
 
 const findManager = async (id) => {
-  const result = await query(`SELECT * from Employee where e.BranchID=${id} and e.IsManager=1`);
+  const result = await escapedQuery({
+    sql: `SELECT * from Employee where e.BranchID=${id} and e.IsManager=1`,
+    values: [id],
+  });
   console.log(result[0]);
   return result[0];
-}
+};
 
 // const addBranch = async (data) => {
 //   const result = await escapedQuery({

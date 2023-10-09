@@ -2,9 +2,10 @@ const { query, escapedQuery } = require("../services/db.service.js");
 const { generateHash } = require("../utils/password_helper.js");
 
 const findOne = async (id) => {
-  const result = await query(
-    `SELECT UserID, Name, Username, Email, Role from User where UserID=${id}`
-  );
+  const result = await escapedQuery({
+    sql: `SELECT UserID, Name, Username, Email, Role from User where UserID=?`,
+    values: [id],
+  });
   console.log(result[0]);
   return result[0];
 };
@@ -17,10 +18,11 @@ const findAll = async () => {
   return result;
 };
 
-const findByUsername = async () => {
-  const result = await query(
-    `SELECT UserID, Name, Username, Email, Password, Role from User where Username=${username}`
-  );
+const findByUsername = async (username) => {
+  const result = await escapedQuery({
+    sql: `SELECT UserID, Name, Username, Email, Password, Role from User where Username=?`,
+    values: [username],
+  });
   console.log(result[0]);
   return result[0];
 };
@@ -44,7 +46,10 @@ const changeAccess = async (id, data) => {
 };
 
 const getPassword = async (id) => {
-  const result = await query(`SELECT Password from User where UserID=${id}`);
+  const result = await escapedQuery({
+    sql: `SELECT Password from User where UserID=?`,
+    values: [id],
+  });
   console.log(result[0]);
   return result[0];
 };
@@ -70,12 +75,13 @@ const addUser = async (username, password) => {
 };
 
 const findEmployeeIDfromUserID = async (userID) => {
-  const result = await query(
-    `SELECT EmployeeID from Employee where UserID=${userID}`
-  );
+  const result = await escapedQuery({
+    sql: `SELECT EmployeeID from Employee where UserID=?`,
+    values: [userID],
+  });
   console.log(result[0]);
   return result[0];
-}
+};
 
 module.exports = {
   findAll,
