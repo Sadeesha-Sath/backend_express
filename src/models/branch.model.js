@@ -13,7 +13,7 @@ const findOne = async (id) => {
 }
 
 const findManager = async (id) => {
-  const result = await query(`SELECT * from Employee e right join Branch b on b.managerID=e.employeeID where b.branchID=${id}`);
+  const result = await query(`SELECT * from Employee where e.branchID=${id} and e.isManager=1`);
   console.log(result[0]);
   return result[0];
 }
