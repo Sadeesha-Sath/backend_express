@@ -2,7 +2,7 @@ const db = require("../src/services/db.service.js");
 
 const deleteAllAdmin = async () => {
   const result = await db.escapedQuery({
-    sql: "DELETE FROM User WHERE role='admin'",
+    sql: "DELETE FROM User WHERE Role='admin'",
   });
   console.log(result);
   return result;

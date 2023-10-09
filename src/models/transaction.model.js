@@ -10,7 +10,7 @@ const findOwn = async (acc) => {
 
 const findOne = async (id) => {
   const result = await query(
-    `SELECT * from Transaction where transactionID=${id}`
+    `SELECT * from Transaction where TransactionID=${id}`
   );
   console.log(result[0]);
   return result[0];
@@ -24,7 +24,7 @@ const findAll = async (id) => {
 
 const findUserIDfromTransactionID = async (transactionID) => {
   const result = await query(
-    `SELECT c.userID from Transaction t inner join Customer c where t.transactionID=${transactionID}`
+    `SELECT c.UserID from Transaction t inner join Customer c where t.TransactionID=${transactionID}`
   );
   console.log(result[0]);
   return result[0];
@@ -36,11 +36,11 @@ const addTransaction = async (data) => {
         SELECT * FROM add_trn(?, ?, ?, ?, ?);
         `,
     values: [
-      data.FromAccNo,
-      data.ToAccNo,
-      data.Amount,
-      data.Type,
-      data.Description,
+      data.fromAccNo,
+      data.toAccNo,
+      data.amount,
+      data.type,
+      data.description,
     ],
   });
   console.log(result);

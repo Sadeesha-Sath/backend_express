@@ -29,6 +29,10 @@ router.get("/:id", (req, res) => {
   ) {
     findOne(req.params.id)
       .then((result) => {
+        if (!result) {
+          res.status(404).send({ message: "No such transaction" });
+          return;
+        }
         res.status(200).json(result);
       })
       .catch((err) => {

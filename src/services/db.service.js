@@ -42,7 +42,7 @@ const query = async (sql) => {
   // });
 };
 
-const escapedQuery = async (sql, values, timeout = 40000) => {
+const escapedQuery = async ({ sql, values }, timeout = 40000) => {
   pool.query(
     {
       sql: sql,

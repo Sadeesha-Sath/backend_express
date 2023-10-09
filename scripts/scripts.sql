@@ -29,7 +29,7 @@ create table Employee (
     position varchar(30) check (position in ('Branch_Manager', 'Other')),
     isManager tinyint,
     PRIMARY KEY (employeeID),
-    FOREIGN KEY (branchID) references Branch(branchID) on delete cascade,
+    FOREIGN KEY (branchID) references Branch(branchID),
     FOREIGN KEY (userID) references user(userID) on delete cascade
 );
 
@@ -49,48 +49,32 @@ create table Customer (
 
 create table Account (
     accountNo varchar(20) NOT NULL,
-    customerID varchar(30),
-    accType varchar(10) check (accType in ('Savings', 'Checking')),
-    branchID varchar(30),
+    customerID int NOT NULL,
+    accType varchar(10) check (accType in ('Savings', 'Checking')) NOT NULL,
+    branchID int NOT NULL,
     balance decimal(15,2),
+    savingsPlanType varchar(20) check (savingsPlanType in ('Children', 'Teen', 'Adult', 'Senior')),
     PRIMARY KEY (accountNo),
     FOREIGN KEY (customerID) references Customer(customerID) on delete cascade,
-	FOREIGN KEY (branchID) references Branch(branchID)
---  TODO Complete this after reviewing the ER diagram
+    FOREIGN KEY (savingsType) references SavingsPlan(savingsType),
+	  FOREIGN KEY (branchID) references Branch(branchID),
+    CHECK (balance >= 0),
+    CHECK ((savingsPlanType is not null and accType = 'Savings') or (savingsPlanType is null and accType = 'Checking'))
 );
 
 CREATE TABLE SavingsPlan (
-  SavingsTypeId varchar(10),
-  PlanType varchar(15) check (PlanType in ('Children', 'Teen', 'Adult', 'Senior')),
+  savingsPlanType varchar(15) check (PlanType in ('Children', 'Teen', 'Adult', 'Senior')),
   InterestRate decimal(5, 2),
   MinimumBalance decimal(15,2),
-  PRIMARY KEY (SavingsTypeId)
-);
-
-CREATE TABLE SavingsAccount (
-  AccountNO varchar(20),
-  SavingsTypeId varchar(10),
-  PRIMARY KEY (AccountNO),
-  FOREIGN KEY (AccountNO) references ACCOUNT(AccountNo), 
-  FOREIGN KEY (SavingsTypeId) references SavingsPlan(SavingsTypeId)
-);
-
-CREATE TABLE CurrentAccount (
-  AccountNO varchar(20),
-  Plan varchar(20),
-  MinimumBalance decimal(15,2),
-  FOREIGN KEY (AccountNO) references ACCOUNT(AccountNO)
+  PRIMARY KEY (savingsPlanType)
 );
 
 CREATE TABLE ChildrensAccount (
-  AccountNO varchar(20),
-  ParentID varchar(10),
-  FOREIGN KEY (AccountNO) REFERENCES ACCOUNT(AccountNo),
-  FOREIGN KEY (ParentID) REFERENCES CUSTOMER(customerID)		
+  AccountN0 varchar(20) NOT NULL,
+  ParentID int NOT NULL,
+  FOREIGN KEY (AccountNo) REFERENCES Account(AccountNo),
+  FOREIGN KEY (ParentID) REFERENCES Customer(customerID)		
 );
-
-
--- TODO Use Triggers to take timestamps on Transactions and other things (And maybe on integrity constraints like manager user employee etc)
 
 create table Transaction (
     transactionID varchar(30) NOT NULL,

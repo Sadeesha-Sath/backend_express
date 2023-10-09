@@ -2,7 +2,7 @@ const { query, escapedQuery } = require("../services/db.service.js");
 
 const findOne = async (id) => {
   const result = await query(
-    `SELECT e.employeeID, u.name, e.branchID, e.position, u.email, u.userID, u.username from Employee e left join User u on e.userID=u.userID where e.employeeID=${id}`
+    `SELECT e.EmployeeID, u.Name, e.BranchID, e.Position, u.Email, u.UserID, u.Username from Employee e left join User u on e.UserID=u.UserID where e.EmployeeID=${id}`
   );
   console.log(result[0]);
   return result[0];
@@ -10,7 +10,7 @@ const findOne = async (id) => {
 
 const findAll = async () => {
   const result = await query(
-    "SELECT e.employeeID, u.name, e.branchID, e.position, u.email, u.userID, u.username from Employee e left join User u on e.userID=u.userID order by e.employeeID"
+    "SELECT e.EmployeeID, u.Name, e.BranchID, e.Position, u.Email, u.UserID, u.Username from Employee e left join User u on e.UserID=u.UserID ORDER BY e.EmployeeID"
   );
   console.log(result);
   return result;
@@ -18,10 +18,24 @@ const findAll = async () => {
 
 const findUserIDfromEmployeeID = async (employeeID) => {
   const result = await query(
-    `SELECT userID from Employee where employeeID=${employeeID}`
+    `SELECT UserID from Employee where EmployeeID=${employeeID}`
   );
   console.log(result[0]);
   return result[0];
 };
 
-module.exports = { findOne, findAll, findUserIDfromEmployeeID };
+const findBranchIDfromEmployeeID = async (employeeID) => {
+  const result = await query(
+    `SELECT BranchID from Employee where EmployeeID=${employeeID}`
+  );
+  console.log(result[0]);
+  return result[0];
+};
+
+
+module.exports = {
+  findOne,
+  findAll,
+  findUserIDfromEmployeeID,
+  findBranchIDfromEmployeeID,
+};
