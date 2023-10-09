@@ -7,13 +7,13 @@ const findAll = async () => {
 };
 
 const findOne = async (id) => {
-  const result = await query(`SELECT * from Branch where branchID=${id}`);
+  const result = await query(`SELECT * from Branch where BranchID=${id}`);
   console.log(result[0]);
   return result[0];
 }
 
 const findManager = async (id) => {
-  const result = await query(`SELECT * from Employee where e.branchID=${id} and e.isManager=1`);
+  const result = await query(`SELECT * from Employee where e.BranchID=${id} and e.IsManager=1`);
   console.log(result[0]);
   return result[0];
 }

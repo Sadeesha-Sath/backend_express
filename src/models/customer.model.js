@@ -6,7 +6,7 @@ const {
 
 const findOne = async (id) => {
   const result = await query(
-    `SELECT c.customerID, u.name, c.customerType, c.nic_br, c.dob, u.email,  c.address, c.phone, u.userID, u.username from Customer c left join User u on c.userID=u.userID where c.customerID=${id}`
+    `SELECT c.CustomerID, u.Name, c.CustomerType, c.NIC_BR, c.DOB, u.Email,  c.Address, c.Phone, u.UserID, u.Username from Customer c left join User u on c.UserID=u.UserID where c.CustomerID=${id}`
   );
   console.log(result[0]);
   return result[0];
@@ -14,7 +14,7 @@ const findOne = async (id) => {
 
 const findAll = async () => {
   const result = await query(
-    "SELECT c.customerID, u.name, c.customerType, c.nic_br, c.dob, u.email, c.address, c.phone, u.userID, u.username from Customer c left join User u on c.userID=u.userID order by c.customerID"
+    "SELECT c.CustomerID, u.Name, c.CustomerType, c.NIC_BR, c.DOB, u.Email, c.Address, c.Phone, u.UserID, u.Username from Customer c left join User u on c.UserID=u.UserID order by c.CustomerID"
   );
   console.log(result);
   return result;
@@ -26,8 +26,8 @@ const addCustomer = async (data) => {
   const result = await escapedQuery({
     sql: `
         START TRANSACTION;
-        INSERT INTO User (userID, name, email, username, password) VALUES (NULL, ?, ?, ?, ?);
-        INSERT INTO Customer (customerID, nic_br, address, phone, userID, customerType, dob) VALUES (NULL, ?, ?, ?, LAST_INSERT_ID(), ?, ?);
+        INSERT INTO User (UserID, Name, Email, Username, Password) VALUES (NULL, ?, ?, ?, ?);
+        INSERT INTO Customer (CustomerID, NIC_BR, Address, Phone, UserID, CustomerType, DOB) VALUES (NULL, ?, ?, ?, LAST_INSERT_ID(), ?, ?);
         COMMIT;`,
     values: [
       data.name,
@@ -47,7 +47,7 @@ const addCustomer = async (data) => {
 
 const findUserIDfromCustomerID = async (customerID) => {
   const result = await query(
-    `SELECT userID from Customer where customerID=${customerID}`
+    `SELECT UserID from Customer where CustomerID=${customerID}`
   );
   console.log(result[0]);
   return result[0];

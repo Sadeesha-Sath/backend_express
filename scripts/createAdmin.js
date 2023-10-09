@@ -6,7 +6,7 @@ const addAdmin = async () => {
   const password = "admin";
   const hashedPass = await generateHash(password);
   const result = await db.escapedQuery({
-    sql: "INSERT INTO User (name, dob, username, password, role) VALUES (?, ?, ?, ?, ?)",
+    sql: "INSERT INTO User (Name, Username, Password, Role) VALUES (?, ?, ?, ?, ?)",
     values: ["admin", "2000-01-01", username, hashedPass, "admin"],
   });
   console.log(result);

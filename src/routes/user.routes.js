@@ -30,7 +30,10 @@ router.get("/:id", (req, res) => {
   if (permissionCheck("ALL_USERS", req.user) || isOwnUser(id, req.user.id)) {
     findOne(req.params.id)
       .then((result) => {
-        console.log(result);
+        if (!result) {
+          res.status(404).send({ message: "No such user" });
+          return;
+        }
         res.status(200).json(result);
       })
       .catch((err) => {

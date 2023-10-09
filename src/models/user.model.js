@@ -3,7 +3,7 @@ const { generateHash } = require("../utils/password_helper.js");
 
 const findOne = async (id) => {
   const result = await query(
-    `SELECT userID, name, username, email, role from User where userID=${id}`
+    `SELECT UserID, Name, Username, Email, Role from User where UserID=${id}`
   );
   console.log(result[0]);
   return result[0];
@@ -11,7 +11,7 @@ const findOne = async (id) => {
 
 const findAll = async () => {
   const result = await query(
-    `SELECT userID, name, username, email, role from User`
+    `SELECT UserID, Name, Username, Email, Role from User`
   );
   console.log(result);
   return result;
@@ -19,7 +19,7 @@ const findAll = async () => {
 
 const findByUsername = async () => {
   const result = await query(
-    `SELECT userID, name, username, email, password, role from User where username=${username}`
+    `SELECT UserID, Name, Username, Email, Password, Role from User where Username=${username}`
   );
   console.log(result[0]);
   return result[0];
@@ -27,7 +27,7 @@ const findByUsername = async () => {
 
 const updateOne = async (id, data) => {
   const result = await escapedQuery({
-    sql: "UPDATE User set name=?, username=?, email=?, where userID=?",
+    sql: "UPDATE User set Name=?, Username=?, Email=?, where UserID=?",
     values: [data.name, data.username, data.email, data.id],
   });
   console.log(result);
@@ -36,7 +36,7 @@ const updateOne = async (id, data) => {
 
 const changeAccess = async (id, data) => {
   const result = await escapedQuery({
-    sql: "UPDATE User set role=? where userID=?",
+    sql: "UPDATE User set Role=? where UserID=?",
     values: [data.role, data.id],
   });
   console.log(result);
@@ -44,7 +44,7 @@ const changeAccess = async (id, data) => {
 };
 
 const getPassword = async (id) => {
-  const result = await query(`SELECT password from User where userID=${id}`);
+  const result = await query(`SELECT Password from User where UserID=${id}`);
   console.log(result[0]);
   return result[0];
 };
@@ -52,7 +52,7 @@ const getPassword = async (id) => {
 const changePassword = async (data) => {
   const hashedPass = await generateHash(data.password);
   const result = await escapedQuery({
-    sql: "UPDATE User set password=? where userID=?",
+    sql: "UPDATE User set Password=? where UserID=?",
     values: [hashedPass, data.id],
   });
   console.log(result);
@@ -62,12 +62,20 @@ const changePassword = async (data) => {
 const addUser = async (username, password) => {
   const hashedPass = await generateHash(password);
   const result = await escapedQuery({
-    sql: `INSERT INTO User (userID, name, email, username, password) VALUES (NULL, ?, ?, ?, ?, ?);`,
+    sql: `INSERT INTO User (UserID, Name, Email, Username, Password) VALUES (NULL, ?, ?, ?, ?, ?);`,
     values: [data.name, data.email, data.username, hashedPass],
   });
   console.log(result);
   return result;
 };
+
+const findEmployeeIDfromUserID = async (userID) => {
+  const result = await query(
+    `SELECT EmployeeID from Employee where UserID=${userID}`
+  );
+  console.log(result[0]);
+  return result[0];
+}
 
 module.exports = {
   findAll,
@@ -78,4 +86,5 @@ module.exports = {
   changePassword,
   findByUsername,
   addUser,
+  findEmployeeIDfromUserID,
 };
