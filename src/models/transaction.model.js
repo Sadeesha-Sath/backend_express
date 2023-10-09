@@ -33,11 +33,7 @@ const findUserIDfromTransactionID = async (transactionID) => {
 const addTransaction = async (data) => {
   const result = await escapedQuery({
     sql: `
-        START TRANSACTION;
-        declare message varchar(100);
-        call add_trn(?, ?, ?, ?, ?, @message);
-        select @message;
-        COMMIT;
+        SELECT * FROM add_trn(?, ?, ?, ?, ?);
         `,
     values: [
       data.FromAccNo,

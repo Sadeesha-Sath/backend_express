@@ -61,21 +61,26 @@ create table Account (
 
 create table Transaction (
     transactionID int NOT NULL AUTO_INCREMENT,
-    fromAccNo int NOT NULL,
-    toAccNo int NOT NULL,
+    fromAccNo int,
+    toAccNo int,
     description varchar(100) DEFAULT 'CEFT',
-    trnType varchar(20) check (trnType in ('Online', 'ATM')),
+    trnType varchar(20) check (trnType in ('Online', 'ATM', 'Loan', 'TrnFee')),
     amount decimal(15, 2) NOT NULL,
     timeStamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (transactionID),
     FOREIGN KEY (toAccNo) references Account(accountNo),
     FOREIGN KEY (fromAccNo) references Account(accountNo),
+    CHECK (amount > 0),
+    CHECK (fromAccNo != toAccNo),
+    CHECK (trnType = 'ATM' and toAccNo is null or trnType != 'ATM' and toAccNo is not null),
+    CHECK (trnType = 'Loan' and fromAccNo is null or trnType != 'Loan' and fromAccNo is not null)
 )
 
 
 CREATE TABLE FixedDeposit (
   FixedId int,
   SavingsAccNo int NOT NULL,
+  StartingAmount decimal(15,2),
   Duration decimal(2) check (Duration in (6, 12, 18)),
   StartDate date,
   LastDeptDate date,
@@ -91,8 +96,10 @@ CREATE TABLE LoanApplication (
   FixedId int,
   CustomerID int NOT NULL,
   BranchID int NOT NULL,
+  Duration decimal(2) check (Duration in (6, 12, 18, 24, 36, 48, 60, 72, 84, 96, 108, 120)),
   Type varchar(15) check (Type in ('Business', 'Personal')),
   ApplicationDate date,
+  ApprovedDate date,
   Amount decimal(15,2),
   Status varchar(10) check (Status in ('Pending', 'Approved', 'Rejected')),
   PRIMARY KEY (LoanApplicationID), 
@@ -110,6 +117,7 @@ CREATE TABLE Loan (
   StartDate date,
   EndDate date,
   Installment decimal(15,2),
+  Balance decimal(15,2),
   isOnline BOOLEAN DEFAULT FALSE,
   FixedId int,
   PRIMARY KEY (LoanID), 
@@ -118,5 +126,25 @@ CREATE TABLE Loan (
   FOREIGN KEY (FixedId) REFERENCES FixedDeposit(FixedId)
   check (isOnline = 1 and FixedId is not null or isOnline = 0 and FixedId is null)
 );
--- TODO Fuction to update the LoanApplication status to approved when a loan is created
 
+CREATE TABLE LoanInterestRate (
+  Duration decimal(2) check (Duration in (6, 12, 18, 24, 36, 48, 60, 72, 84, 96, 108, 120)),
+  Type varchar(15) check (Type in ('Business', 'Personal')),
+  InterestRate decimal(5,2),
+  PRIMARY KEY (Duration, Type)
+)
+
+CREATE TABLE LoanInstallment (
+  LoanID int NOT NULL,
+  PaymentDate date,
+  DueDate date NOT NULL,
+  Status varchar(10) check (Status in ('Pending', 'Paid', 'Overdue')),
+  PRIMARY KEY (LoanID, DueDate),
+  FOREIGN KEY (LoanID) REFERENCES Loan(LoanID)
+)
+
+CREATE TABLE FixedDepositInterestRate (
+  Duration decimal(2) NOT NULL check (Duration in (6, 12, 36)),
+  InterestRate decimal(5,2),
+  PRIMARY KEY (Duration)
+)
