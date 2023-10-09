@@ -7,12 +7,13 @@ BEGIN ATOMIC
     IF (trnType = 'Online') THEN
         -- Check if the account has exceeded the monthly withdrawal limit
         IF @accType = 'Savings' THEN
-            SELECT COUNT(*) INTO @count FROM Transaction t WHERE t.FromAccNo = fromAccNo AND t.TrnType in ('Online', 'ATM') AND MONTH(t.TransactionDate) = MONTH(CURDATE());
+            SELECT COUNT(*) INTO @count FROM MonthlyTransactionView WHERE FromAccNo = fromAccNo;
             IF @count > 5 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Monthly Transaction Limit Exceeded';
             END IF;
         END IF;
         SELECT @fromBalance := Balance @accType := AccType FROM Account WHERE AccountNo = fromAccNo FOR UPDATE;
+        -- TODO Check if this need to amended with the minimum balance of the account
         IF @fromBalance < amount THEN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Insufficient Balance';
         END IF;
@@ -29,14 +30,14 @@ BEGIN ATOMIC
     ELSE IF (trnType = 'ATM') THEN
         -- Check if the account has exceeded the monthly withdrawal limit
         IF @accType = 'Savings' THEN
-            SELECT COUNT(*) INTO @count FROM Transaction t
-                WHERE t.FromAccNo = fromAccNo AND t.TrnType in ('Online', 'ATM') AND MONTH(t.TransactionDate) = MONTH(CURDATE());
+            SELECT COUNT(*) INTO @count FROM MonthlyTransactionView WHERE FromAccNo = fromAccNo;
             IF @count > 5 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Monthly Transaction Limit Exceeded';
             END IF;
         END IF;
         SELECT @fromBalance := Balance FROM Account WHERE AccountNo = fromAccNo FOR UPDATE;
-        SET @TrnFee := 30;
+        SET @TrnFee := 30; -- Transaction Fee of an ATM Withdrawal
+        -- TODO Check if this need to amended with the minimum balance of the account
         IF @fromBalance < (amount+@TrnFee) THEN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Insufficient Balance';
         END IF;
