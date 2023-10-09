@@ -2,7 +2,7 @@ const { query, escapedQuery } = require("../services/db.service.js");
 
 const findOne = async (id) => {
   const result = await escapedQuery({
-    sql: `SELECT e.EmployeeID, u.Name, e.BranchID, e.Position, u.Email, u.UserID, u.Username from Employee e left join User u on e.UserID=u.UserID where e.EmployeeID=?`,
+    sql: `SELECT * FROM EmployeeView WHERE e.EmployeeID=?`,
     values: [id],
   });
   console.log(result[0]);
@@ -11,7 +11,7 @@ const findOne = async (id) => {
 
 const findAll = async () => {
   const result = await query(
-    "SELECT e.EmployeeID, u.Name, e.BranchID, e.Position, u.Email, u.UserID, u.Username from Employee e left join User u on e.UserID=u.UserID ORDER BY e.EmployeeID"
+    "SELECT * FROM EmployeeView ORDER BY EmployeeID"
   );
   console.log(result);
   return result;

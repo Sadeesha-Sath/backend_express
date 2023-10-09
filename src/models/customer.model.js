@@ -6,19 +6,7 @@ const {
 
 const findOne = async (id) => {
   const result = await escapedQuery({
-    sql: `SELECT
-    c.CustomerID,
-    u.Name,
-    c.CustomerType,
-    c.NIC_BR,
-    c.DOB,
-    u.Email,
-    c.Address,
-    c.Phone,
-    u.UserID,
-    u.Username
-    from Customer c left join User u
-    on c.UserID=u.UserID where c.CustomerID=?`,
+    sql: `SELECT * FROM CustomerView WHERE c.CustomerID=?`,
     values: [id],
   });
   console.log(result[0]);
@@ -27,7 +15,7 @@ const findOne = async (id) => {
 
 const findAll = async () => {
   const result = await query(
-    "SELECT c.CustomerID, u.Name, c.CustomerType, c.NIC_BR, c.DOB, u.Email, c.Address, c.Phone, u.UserID, u.Username from Customer c left join User u on c.UserID=u.UserID order by c.CustomerID"
+    "SELECT * from CustomerView ORDER BY CustomerID ASC"
   );
   console.log(result);
   return result;
@@ -55,8 +43,11 @@ const addCustomer = async (data) => {
 };
 
 const findUserIDfromCustomerID = async (customerID) => {
-  const result = await query(
-    `SELECT UserID from Customer where CustomerID=${customerID}`
+  const result = await escapedQuery(
+    {
+      sql: `SELECT UserID from CustomerView where CustomerID=?`,
+      values: [customerID],
+    }
   );
   console.log(result[0]);
   return result[0];
