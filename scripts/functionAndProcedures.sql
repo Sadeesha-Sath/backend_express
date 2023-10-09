@@ -40,8 +40,8 @@ BEGIN ATOMIC
         INSERT INTO Transaction (transactionID, fromAccNo, toAccNo, amount, trnType,  description) VALUES (NULL, fromAccNo, NULL, amount, trnType, description);
         INSERT INTO Transaction (transactionID, fromAccNo, toAccNo, amount, trnType,  description) VALUES (NULL, fromAccNo, NULL, amount, 'TrnFee', "Transaction Fee for TransactionID: " + LAST_INSERT_ID());
         RETURN 'Transaction Successful';
-
-END
+    END IF;
+END;
 
 create function approve_loan (loanApplicationID int)
 returns int
@@ -68,14 +68,14 @@ BEGIN ATOMIC
     INSERT INTO LoanInstallment (LoanID, DueDate) VALUES (@LoanID, @CurDate + INTERVAL i MONTH);
     END LOOP;
     RETURN @LoanID;
-END
+END;
 
 CREATE function reject_loan (loanApplicationID int)
 returns int
 BEGIN ATOMIC
     UPDATE LoanApplication SET status = 'Rejected' WHERE LoanApplicationID = loanApplicationID;
     RETURN 1;
-END
+END;
 
 CREATE FUNCTION pay_installement (loanID int)
 returns varchar(100)
@@ -95,7 +95,7 @@ BEGIN ATOMIC
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Loan Already Paid';
     END IF;
-END
+END;
 
 CREATE FUNCTION submit_online_loan (FixedId int, customerID int, branchID int, duration decimal(2), type varchar(15), amount decimal(15,2))
 returns int
@@ -155,5 +155,5 @@ BEGIN ATOMIC
         END LOOP;
         RETURN @LoanID;
     END IF;
-END
+END;
 
