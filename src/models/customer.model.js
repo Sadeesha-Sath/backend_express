@@ -24,11 +24,7 @@ const addCustomer = async (data) => {
   const password = data.password ? data.password : generateRandomPass();
   const hashedPass = await generateHash(password);
   const result = await escapedQuery({
-    sql: `
-        START TRANSACTION;
-        INSERT INTO User (UserID, Name, Email, Username, Password) VALUES (NULL, ?, ?, ?, ?);
-        INSERT INTO Customer (CustomerID, NIC_BR, Address, Phone, UserID, CustomerType, DOB) VALUES (NULL, ?, ?, ?, LAST_INSERT_ID(), ?, ?);
-        COMMIT;`,
+    sql: `SELECT * FROM add_customer(?, ?, ?, ?, ?, ?, ?, ?)`,
     values: [
       data.name,
       data.username,

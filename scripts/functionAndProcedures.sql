@@ -188,4 +188,29 @@ BEGIN ATOMIC
             );
 END$$
 
+CREATE FUNCTION get_own_account (userID int)
+returns table (
+    AccountNo varchar(20),
+    CustomerID int,
+    AccType varchar(10) check (AccType in ('Savings', 'Checking')),
+    BranchID int,
+    Balance decimal(15,2),
+    SavingsPlanType varchar(20),
+)
+BEGIN ATOMIC
+    SELECT @CustomerID := CustomerID FROM Customer WHERE UserID = userID;
+    RETURN TABLE (SELECT AccountNo, CustomerID, AccType, BranchID, Balance, SavingsPlanType FROM Account WHERE CustomerID = @CustomerID);
+END$$
+
+CREATE FUNCTION add_customer (Name varchar(100), Email varchar(100), Username varchar(50), Password varchar(1000), NIC_BR varchar(30), Address varchar(155), Phone varchar(15),CustomerType int , DOB date)
+returns table (
+    Username varchar(100),
+    Email varchar(100)
+)
+BEGIN ATOMIC
+    INSERT INTO User (UserID, Name, Email, Username, Password) VALUES (NULL, Name, Email, Username, Password);
+    INSERT INTO Customer (CustomerID, NIC_BR, Address, Phone, UserID, CustomerType, DOB) VALUES (NULL, NIC_BR, Address, Phone, LAST_INSERT_ID(), CustomerType, DOB);
+END$$
+
+
 Delimiter ;
