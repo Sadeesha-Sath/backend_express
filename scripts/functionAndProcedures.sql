@@ -212,4 +212,5 @@ BEGIN ATOMIC
     INSERT INTO Customer (CustomerID, NIC_BR, Address, Phone, UserID, CustomerType, DOB) VALUES (NULL, NIC_BR, Address, Phone, LAST_INSERT_ID(), CustomerType, DOB);
 END$$
 
+
 Delimiter ;
