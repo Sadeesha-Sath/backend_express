@@ -31,7 +31,7 @@ create table User (
     Role varchar(30) CHECK (Role in ('admin', 'b_manager', 'employee', 'customer')) NOT NULL,
     Username varchar(50) NOT NULL,
     Email varchar(100),
-    password varchar(400) NOT NULL,
+    password varchar(1000) NOT NULL,
     PRIMARY KEY (UserID)
 );
 
