@@ -4,7 +4,7 @@ USE BANKING_SYSTEM;
 
 
 create table Branch (
-    BranchID int NOT NULL AUTO_INCREMENT ,
+    BranchID varchar(20) NOT NULL,
     BranchName varchar(100),
     Address varchar(255),
     Phone varchar(15),
@@ -13,7 +13,7 @@ create table Branch (
 );
 
 create table User (
-    UserID int NOT NULL AUTO_INCREMENT,
+    UserID varchar(20) NOT NULL,
     Name varchar(100),
     Role varchar(30) CHECK (Role in ('admin', 'b_manager', 'employee', 'customer')) NOT NULL,
     Username varchar(50) NOT NULL,
@@ -23,9 +23,9 @@ create table User (
 );
 
 create table Employee (
-    EmployeeID int NOT NULL AUTO_INCREMENT,
-    BranchID int NOT NULL,
-    UserID int NOT NULL,
+    EmployeeID varchar(20) NOT NULL,
+    BranchID varchar(20) NOT NULL,
+    UserID varchar(20) NOT NULL,
     Position varchar(30) check (Position in ('Branch_Manager', 'Other')),
     IsManager BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (EmployeeID),
@@ -34,12 +34,12 @@ create table Employee (
 );
 
 create table Customer (
-    CustomerID int NOT NULL AUTO_INCREMENT,
+    CustomerID varchar(20) NOT NULL,
     NIC_BR varchar(30),
     DOB date,
     Address varchar(255),
     Phone varchar(15),
-    UserID int,
+    UserID varchar(20),
     CustomerType varchar(30) check (CustomerType in ('Individual', 'Organization')),
     PRIMARY KEY (CustomerID),
     FOREIGN KEY (UserID) references User(UserID) on delete cascade
@@ -54,9 +54,9 @@ CREATE TABLE SavingsPlan (
 
 CREATE TABLE Account (
     AccountNo varchar(20) NOT NULL,
-    CustomerID int NOT NULL,
+    CustomerID varchar(20) NOT NULL,
     AccType varchar(10) check (AccType in ('Savings', 'Checking')) NOT NULL,
-    BranchID int NOT NULL,
+    BranchID varchar(20) NOT NULL,
     Balance decimal(15,2),
     SavingsPlanType varchar(20) check (SavingsPlanType in ('Children', 'Teen', 'Adult', 'Senior')),
     PRIMARY KEY (AccountNo),
@@ -69,13 +69,13 @@ CREATE TABLE Account (
 
 CREATE TABLE ChildrensAccount (
   AccountNo varchar(20) NOT NULL,
-  ParentID int NOT NULL,
+  ParentID varchar(20) NOT NULL,
   FOREIGN KEY (AccountNo) REFERENCES Account(AccountNo),
   FOREIGN KEY (ParentID) REFERENCES Customer(customerID)		
 );
 
 create table Transaction (
-    TransactionID int NOT NULL AUTO_INCREMENT,
+    TransactionID varchar(20) NOT NULL,
     FromAccNo varchar(20),
     ToAccNo varchar(20),
     Description varchar(100) DEFAULT 'CEFT',
@@ -101,22 +101,22 @@ CREATE TABLE FixedDeposit (
   LastDeptDate date,
   InterestRate decimal(5,2),
   PRIMARY KEY (FixedId),
-  FOREIGN KEY (SavingsAccNo) REFERENCES Account(accountNo)
+  FOREIGN KEY (SavingsAccNo) REFERENCES Account(AccountNo)
 );
 
 
 CREATE TABLE LoanApplication (
-  LoanApplicationID int NOT NULL AUTO_INCREMENT,
+  LoanApplicationID varchar(20) NOT NULL,
   IsOnline BOOLEAN DEFAULT FALSE,
   FixedId varchar(20),
-  CustomerID int NOT NULL,
-  BranchID int NOT NULL,
+  CustomerID varchar(20) NOT NULL,
+  BranchID varchar(20) NOT NULL,
   Duration decimal(2) check (Duration in (6, 12, 18, 24, 36, 48, 60, 72, 84, 96, 108, 120)),
   Type varchar(15) check (Type in ('Business', 'Personal')),
   CreatedTimeStamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CreatedBy int,
+  CreatedBy varchar(20),
   CheckedDate date,
-  CheckedBy int,
+  CheckedBy varchar(20),
   Amount decimal(15,2),
   Status varchar(10) check (Status in ('Pending', 'Approved', 'Rejected')),
   PRIMARY KEY (LoanApplicationID), 
@@ -130,9 +130,9 @@ CREATE TABLE LoanApplication (
 
 
 CREATE TABLE Loan (
-  LoanID int NOT NULL AUTO_INCREMENT,
-  CustomerID int NOT NULL,
-  LoanApplicationID int NOT NULL,
+  LoanID varchar(20) NOT NULL,
+  CustomerID varchar(20) NOT NULL,
+  LoanApplicationID varchar(20) NOT NULL,
   Amount decimal(15,2),
   StartDate date,
   EndDate date,
@@ -155,7 +155,7 @@ CREATE TABLE LoanInterestRate (
 );
 
 CREATE TABLE LoanInstallment (
-  LoanID int NOT NULL,
+  LoanID varchar(20) NOT NULL,
   PaymentDate date,
   DueDate date NOT NULL,
   Status varchar(10) check (Status in ('Pending', 'Paid', 'Overdue')),
