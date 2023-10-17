@@ -59,19 +59,15 @@ CREATE TABLE Account (
     BranchID varchar(20) NOT NULL,
     Balance decimal(15,2),
     SavingsPlanType varchar(20) check (SavingsPlanType in ('Children', 'Teen', 'Adult', 'Senior')),
+    ParentID varchar(20),
     PRIMARY KEY (AccountNo),
+    FOREIGN KEY (ParentID) references Customer(CustomerID) on delete cascade,
     FOREIGN KEY (CustomerID) references Customer(CustomerID) on delete cascade,
     FOREIGN KEY (SavingsPlanType) references SavingsPlan(SavingsPlanType),
-	  FOREIGN KEY (BranchID) references Branch(BranchID),
-    CHECK (Balance >= 0 and AccType = 'Saving' or Balance >= -100000 and AccType = 'Checking'),
+	FOREIGN KEY (BranchID) references Branch(BranchID),
+	CHECK ((ParentID is not null and SavingsPlanType = 'Children') or (SavingsPlanType != 'Children' and ParentID is null)),
+    CHECK ((Balance >= 0 and AccType = 'Savings') or (Balance >= -100000 and AccType = 'Checking')),
     CHECK ((SavingsPlanType is not null and AccType = 'Savings') or (SavingsPlanType is null and AccType = 'Checking'))
-);
-
-CREATE TABLE ChildrensAccount (
-  AccountNo varchar(20) NOT NULL,
-  ParentID varchar(20) NOT NULL,
-  FOREIGN KEY (AccountNo) REFERENCES Account(AccountNo),
-  FOREIGN KEY (ParentID) REFERENCES Customer(customerID)		
 );
 
 create table Transaction (
@@ -101,7 +97,7 @@ CREATE TABLE FixedDeposit (
   LastDeptDate date,
   InterestRate decimal(5,2),
   PRIMARY KEY (FixedId),
-  FOREIGN KEY (SavingsAccNo) REFERENCES Account(AccountNo)
+  FOREIGN KEY (SavingsAccNo) REFERENCES Account(accountNo)
 );
 
 
@@ -125,7 +121,8 @@ CREATE TABLE LoanApplication (
   FOREIGN KEY (CheckedBy) REFERENCES Employee(EmployeeID),
   FOREIGN KEY (FixedId) REFERENCES FixedDeposit(FixedId),
   FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-  check (IsOnline = 1 and FixedId is not null or IsOnline = 0 and FixedId is null)
+  check (IsOnline = 1 and FixedId is not null or IsOnline = 0 and FixedId is null),
+  CHECK ((isOnline = 1 and Status != 'Pending') or (isOnline =0))
 );
 
 
