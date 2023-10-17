@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const permissionCheck = require("../utils/permissionCheck");
+const permissionCheck = require("@utils/permissionCheck");
 const {
   findOne,
   findAll,
   updateOne,
   getPassword,
   changePassword,
-} = require("../models/user.model");
-const { isOwnUser } = require("../models/isOwnData");
-const { comparePasswords } = require("../utils/password_helper");
+} = require("@models/user.model");
+const { isOwnUser } = require("@models/isOwnData");
+const { comparePasswords } = require("@utils/password_helper");
 
 router.get("/", async (req, res) => {
   if (permissionCheck("ALL_USERS", req.user)) {

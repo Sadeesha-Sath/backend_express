@@ -1,4 +1,4 @@
-const { query, escapedQuery } = require("../services/db.service.js");
+const { query, escapedQuery } = require("@services/db.service.js");
 
 const findAll = async (BranchID) => {
   let result;
@@ -24,12 +24,11 @@ const findOne = async (id) => {
 
 const findfromUser = async (userID) => {
   const result = await escapedQuery({
-      sql: `SELECT * FROM get_own_account(?)`,
-      values: [userID],
+    sql: `SELECT * FROM get_own_account(?)`,
+    values: [userID],
   });
   console.log(result);
   return result;
 };
-
 
 module.exports = { findAll, findOne, findfromUser };

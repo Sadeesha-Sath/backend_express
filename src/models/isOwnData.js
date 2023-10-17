@@ -1,4 +1,4 @@
-const { findUserIDfromCustomerID } = require("../models/customer.model.js");
+const { findUserIDfromCustomerID } = require("@models/customer.model.js");
 const {
   findUserIDfromEmployeeID,
   findBranchIDfromEmployeeID,

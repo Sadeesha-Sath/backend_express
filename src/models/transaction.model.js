@@ -1,4 +1,4 @@
-const { query, escapedQuery } = require("../services/db.service.js");
+const { query, escapedQuery } = require("@services/db.service.js");
 
 const findOwn = async (acc) => {
   const result = await escapedQuery({
@@ -27,7 +27,7 @@ const findAll = async (id) => {
 const findUserIDfromTransactionID = async (transactionID) => {
   const result = await escapedQuery({
     sql: `SELECT c.UserID from Transaction t inner join Customer c where t.TransactionID=?`,
-    values:[transactionID]
+    values: [transactionID],
   });
   console.log(result[0]);
   return result[0];

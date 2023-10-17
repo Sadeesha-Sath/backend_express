@@ -1,5 +1,5 @@
 const express = require("express");
-const permissionCheck = require("../utils/permissionCheck");
+const permissionCheck = require("@utils/permissionCheck");
 const router = express.Router();
 
 router.get("/", (req, res) => {

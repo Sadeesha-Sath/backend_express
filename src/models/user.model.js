@@ -1,5 +1,5 @@
-const { query, escapedQuery } = require("../services/db.service.js");
-const { generateHash } = require("../utils/password_helper.js");
+const { query, escapedQuery } = require("@services/db.service.js");
+const { generateHash } = require("@utils/password_helper.js");
 
 const findOne = async (id) => {
   const result = await escapedQuery({

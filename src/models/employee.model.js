@@ -1,4 +1,4 @@
-const { query, escapedQuery } = require("../services/db.service.js");
+const { query, escapedQuery } = require("@services/db.service.js");
 
 const findOne = async (id) => {
   const result = await escapedQuery({
@@ -10,9 +10,7 @@ const findOne = async (id) => {
 };
 
 const findAll = async () => {
-  const result = await query(
-    "SELECT * FROM EmployeeView ORDER BY EmployeeID"
-  );
+  const result = await query("SELECT * FROM EmployeeView ORDER BY EmployeeID");
   console.log(result);
   return result;
 };

@@ -1,4 +1,4 @@
-import "../configs/db.config"
+import "@configs/db.config"
 
 const getOffset = (currentPage = 1, listPerPage) => {
   return (currentPage - 1) * [listPerPage];

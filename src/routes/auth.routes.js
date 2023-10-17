@@ -1,6 +1,6 @@
 const express = require("express");
-const { findByUsername, addUser } = require("../models/user.model");
-const { comparePasswords } = require("../utils/password_helper");
+const { findByUsername, addUser } = require("@models/user.model");
+const { comparePasswords } = require("@utils/password_helper");
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -12,7 +12,7 @@ router.post("/login", async (req, res) => {
       if (user) {
         if (comparePasswords(password, user.password)) {
           const { password, ...userToken } = user;
-          const token = jwt.sign({ user:userToken }, process.env.API_SECRET, {
+          const token = jwt.sign({ user: userToken }, process.env.API_SECRET, {
             expiresIn: 86400, // 1 day
           });
           res.status(200).send({
@@ -58,7 +58,5 @@ router.post("/signup", async (req, res) => {
     res.status(400).send({ message: "Username and password are required" });
   }
 });
-
-
 
 module.exports = router;
