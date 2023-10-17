@@ -11,7 +11,7 @@ CREATE VIEW SavingsAccountView AS
 SELECT a.AccountNo, a.CustomerID, a.AccType, a.BranchID, a.Balance, s.SavingsPlanType, s.InterestRate, s.MinimumBalance FROM Account a LEFT JOIN SavingsPlan s ON a.SavingsPlanType = s.SavingsPlanType WHERE a.AccType = 'Savings';
 
 CREATE VIEW ChildrenSavingsAccountView AS
-SELECT s.AccountNo, s.CustomerID, c.ParentID s.AccType, s.BranchID, s.Balance, s.SavingsPlanType, s.InterestRate, s.MinimumBalance FROM SavingsAccountView s LEFT JOIN ChildrensAccount c ON s.AccountNo=c.Account WHERE s.SavingsPlanType = 'Children';
+SELECT s.AccountNo, s.CustomerID, c.ParentID, s.AccType, s.BranchID, s.Balance, s.SavingsPlanType, s.InterestRate, s.MinimumBalance FROM SavingsAccountView s LEFT JOIN ChildrensAccount c ON s.AccountNo=c.AccountNo WHERE s.SavingsPlanType = 'Children';
 
 CREATE VIEW MonthlyTransactionView AS
-SELECT TransactionID, FromAccNo, Amount, Type, Description, Date FROM Transaction WHERE Type in ('Online', 'ATM') AND MONTH(Date) = MONTH(CURDATE()) AND YEAR(Date) = YEAR(CURDATE());
+SELECT TransactionID, FromAccNo, Amount, TrnType, Description, TimeStamp FROM Transaction WHERE TrnType in ('Online', 'ATM') AND MONTH(TimeStamp) = MONTH(CURDATE()) AND YEAR(TimeStamp) = YEAR(CURDATE());
