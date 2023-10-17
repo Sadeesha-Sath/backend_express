@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+require("module-alias/register");
 
 const app = express();
 app.use(cors()); // include before other routes
@@ -36,12 +37,9 @@ app.use("*", (req, res, next) => {
 // Start server
 const port = process.env.PORT || 8080;
 
-db.connect()
-  .then(() => {
-    console.log("Connected to database");
-    app.listen(port, () => {
-      console.log(`App is listnening on port ${port}`);
-    });
+app
+  .listen(port, () => {
+    console.log(`App is listnening on port ${port}`);
   })
   .catch((err) => {
     console.error(err);

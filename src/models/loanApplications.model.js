@@ -1,4 +1,4 @@
-const { query, escapedQuery } = require("../services/db.service.js");
+const { query, escapedQuery } = require("@services/db.service.js");
 
 const findAll = async (BranchID) => {
   let result;

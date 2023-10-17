@@ -1,6 +1,6 @@
 const express = require("express");
-const permissionCheck = require("../utils/permissionCheck");
-const { findAll, findOne, addCustomer } = require("../models/customer.model");
+const permissionCheck = require("@utils/permissionCheck");
+const { findAll, findOne, addCustomer } = require("@models/customer.model");
 const router = express.Router();
 
 router.get("/", (req, res) => {

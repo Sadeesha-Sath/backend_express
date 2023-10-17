@@ -1,7 +1,7 @@
 const express = require("express");
-const permissionCheck = require("../utils/permissionCheck");
-const { findOwn, findAll, findOne } = require("../models/transaction.model");
-const { isOwnAccount } = require("../models/isOwnData");
+const permissionCheck = require("@utils/permissionCheck");
+const { findOwn, findAll, findOne } = require("@models/transaction.model");
+const { isOwnAccount } = require("@models/isOwnData");
 const router = express.Router();
 
 // TODO Compelete this module

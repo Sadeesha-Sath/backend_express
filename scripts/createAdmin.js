@@ -1,5 +1,7 @@
-const db = require("../src/services/db.service.js");
-const { generateHash } = require("../src/utils/password_helper.js");
+require("module-alias/register");
+
+const db = require("@services/db.service.js");
+const { generateHash } = require("@utils/password_helper.js");
 
 const addAdmin = async () => {
   const username = "admin";

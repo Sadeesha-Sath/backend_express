@@ -8,7 +8,7 @@ const {
   rejectLoanApplication,
   addOnlineLoanApplication,
   addOfflineLoanApplication,
-} = require("../models/loanApplications.model.js");
+} = require("@models/loanApplications.model.js");
 
 // GET all loan applications
 router.get("/", (req, res) => {

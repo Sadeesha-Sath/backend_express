@@ -1,4 +1,6 @@
-const db = require("../src/services/db.service.js");
+require("module-alias/register");
+
+const db = require("@services/db.service.js");
 
 const deleteAllAdmin = async () => {
   const result = await db.escapedQuery({

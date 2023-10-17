@@ -1,8 +1,8 @@
-const { query, escapedQuery } = require("../services/db.service.js");
+const { query, escapedQuery } = require("@services/db.service.js");
 const {
   generateRandomPass,
   generateHash,
-} = require("../utils/password_helper.js");
+} = require("@utils/password_helper.js");
 
 const findOne = async (id) => {
   const result = await escapedQuery({
@@ -43,12 +43,10 @@ const addCustomer = async (data) => {
 };
 
 const findUserIDfromCustomerID = async (customerID) => {
-  const result = await escapedQuery(
-    {
-      sql: `SELECT UserID from CustomerView where CustomerID=?`,
-      values: [customerID],
-    }
-  );
+  const result = await escapedQuery({
+    sql: `SELECT UserID from CustomerView where CustomerID=?`,
+    values: [customerID],
+  });
   console.log(result[0]);
   return result[0];
 };

@@ -1,6 +1,6 @@
 const express = require("express");
-const permissionCheck = require("../utils/permissionCheck");
-const { findAll, findOne, findManager } = require("../models/branch.model");
+const permissionCheck = require("@utils/permissionCheck");
+const { findAll, findOne, findManager } = require("@models/branch.model");
 const router = express.Router();
 
 router.get("/", (req, res) => {
