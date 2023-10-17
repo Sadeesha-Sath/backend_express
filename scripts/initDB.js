@@ -1,19 +1,35 @@
 const db = require("../src/services/db.service.js");
-const { generateHash } = require("../src/utils/password_helper.js");
-const fs = requre("fs");
+const fs = require("fs");
 
 
 
 const initDB = async () => {
-  const dataSql = fs.readFileSync("./setup_db.sql").toString();
-  const dataArr = dataSql.toString().split(");");
+  const dbSQL = fs.readFileSync("./setup_db.sql").toString();
+  const dbArray = dbSQL.toString().split(");");
   
-  const result = await db.escapedQuery({
-    sql: "INSERT INTO User (Name, Username, Password, Role) VALUES (?, ?, ?, ?, ?)",
-    values: ["admin", "2000-01-01", username, hashedPass, "admin"],
-  });
-  console.log(result);
-  return result;
+  for (let query of dbArray) {
+    const result = await db.escapedQuery({
+      sql: query
+    });
+    console.log(result);
+  }
+  const dataSQL = fs.readFileSync("./insert_dummy_data.sql").toString();
+  const dataArray = dataSQL.toString().split(");");
+  for (let query of dataArray) {
+    const result = await db.escapedQuery({
+      sql: query
+    });
+    console.log(result);
+  }
+  const viewSQL = fs.readFileSync("./views.sql").toString();
+  const viewArray = viewSQL.toString().split(");");
+  for (let query of viewArray) {
+    const result = await db.escapedQuery({
+      sql: query
+    });
+    console.log(result);
+  }
+  console.log("Database setup complete.");
 };
 
 db.connect().then(() => {
