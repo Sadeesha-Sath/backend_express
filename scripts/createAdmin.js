@@ -15,15 +15,13 @@ const addAdmin = async () => {
   return result;
 };
 
-db.connect().then(() => {
-  addAdmin()
-    .then(() => {
-      console.log("Admin created with username: admin and password: admin");
-      console.log("Exiting...");
-      process.exit();
-    })
-    .catch((err) => {
-      console.log(err);
-      process.exit();
-    });
-});
+addAdmin()
+  .then(() => {
+    console.log("Admin Added.");
+    console.log("Exiting...");
+    process.exit();
+  })
+  .catch((err) => {
+    console.log(err);
+    process.exit();
+  });

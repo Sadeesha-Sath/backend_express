@@ -10,17 +10,15 @@ const deleteAllAdmin = async () => {
   return result;
 };
 
-db.connect().then(() => {
-  deleteAllAdmin()
-    .then(() => {
-      console.log(
-        "All admins deleted. Please consider running create admin script to add admin users."
-      );
-      console.log("Exiting...");
-      process.exit();
-    })
-    .catch((err) => {
-      console.log(err);
-      process.exit();
-    });
-});
+deleteAllAdmin()
+  .then(() => {
+    console.log(
+      "All admins deleted. Please consider running create admin script to add admin users."
+    );
+    console.log("Exiting...");
+    process.exit();
+  })
+  .catch((err) => {
+    console.log(err);
+    process.exit();
+  });
