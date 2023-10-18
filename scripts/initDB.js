@@ -6,12 +6,15 @@ const path = require("path");
 
 const initDB = async () => {
   const dbSQL = fs
-    .readFileSync(path.resolve(__dirname, "./scripts/setup_db.sql"))
+    .readFileSync(path.resolve(__dirname, "./setup_db.sql"))
     .toString();
-  const dbArray = dbSQL.toString().trimStart().split(";");
+  const dbArray = dbSQL.toString().trimStart().split("-- Query Sep");
 
   for (let query of dbArray) {
-    console.log(query + ";");
+    if (query === "" || query === " ") continue; // Skip empty queries
+    console.log("Query\n\n");
+    console.log(query);
+    console.log("\n\n");
     try {
       const result = await db.escapedQuery({
         sql: query + ";",
@@ -21,29 +24,85 @@ const initDB = async () => {
       console.log(err);
     }
   }
-  const dataSQL = fs
-    .readFileSync(path.resolve(__dirname, "./scripts/insert_dummy_data.sql"))
-    .toString();
-  const dataArray = dataSQL.toString().trimStart().split(";");
-  for (let query of dataArray) {
-    console.log(query);
-    const result = await db.escapedQuery({
-      sql: query + ";",
-    });
-    console.log(result);
-  }
   const viewSQL = fs
-    .readFileSync(path.resolve(__dirname, "./scripts/views.sql"))
+    .readFileSync(path.resolve(__dirname, "./views.sql"))
     .toString();
-  const viewArray = viewSQL.toString().trimStart().split(";");
+  const viewArray = viewSQL.toString().trimStart().split("-- Query Sep");
 
   for (let query of viewArray) {
+    if (query === "" || query === " ") continue; // Skip empty queries
+    console.log("Query\n\n");
     console.log(query);
-    if (query === "") continue;
-    const result = await db.escapedQuery({
-      sql: query + ";",
-    });
-    console.log(result);
+    console.log("\n\n");
+    try {
+      const result = await db.escapedQuery({
+        sql: query + ";",
+      });
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const procSQL = fs
+    .readFileSync(path.resolve(__dirname, "./functionAndProcedures.sql"))
+    .toString();
+  const procArray = procSQL.toString().trimStart().split("-- Query Sep");
+
+  for (let query of procArray) {
+    if (query === "" || query === " ") continue; // Skip empty queries
+    console.log("Query\n\n");
+    console.log(query);
+    console.log("\n\n");
+    try {
+      const result = await db.escapedQuery({
+        sql: query + ";",
+      });
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const triggerSQL = fs
+    .readFileSync(path.resolve(__dirname, "./triggers.sql"))
+    .toString();
+  const triggerArray = triggerSQL.toString().trimStart().split("-- Query Sep");
+
+  for (let query of triggerArray) {
+    if (query === "" || query === " ") continue; // Skip empty queries
+    console.log("Query\n\n");
+    console.log(query);
+    console.log("\n\n");
+    try {
+      const result = await db.escapedQuery({
+        sql: query + ";",
+      });
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  const dataSQL = fs
+    .readFileSync(path.resolve(__dirname, "./insert_dummy_data.sql"))
+    .toString();
+
+  const dataArray = dataSQL.toString().trimStart().split("-- Query Sep");
+
+  for (let query of dataArray) {
+    if (query === "" || query === " ") continue; // Skip empty queries
+    console.log("Query\n\n");
+    console.log(query);
+    console.log("\n\n");
+    try {
+      const result = await db.escapedQuery({
+        sql: query + ";",
+      });
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
   }
   console.log("Database setup complete.");
 };

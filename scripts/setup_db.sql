@@ -1,19 +1,22 @@
 DROP DATABASE IF EXISTS BANKING_SYSTEM;
+-- Query Sep
 CREATE DATABASE BANKING_SYSTEM;
+-- Query Sep
 USE BANKING_SYSTEM;
+-- Query Sep
 
 
 create table Branch (
-    BranchID varchar(20) NOT NULL,
+    BranchID int NOT NULL auto_increment,
     BranchName varchar(100),
     Address varchar(255),
     Phone varchar(15),
     Email varchar(100),
     PRIMARY KEY (BranchID)
 );
-
+-- Query Sep
 create table User (
-    UserID varchar(20) NOT NULL,
+    UserID int NOT NULL auto_increment,
     Name varchar(100),
     Role varchar(30) CHECK (Role in ('admin', 'b_manager', 'employee', 'customer')) NOT NULL,
     Username varchar(50) NOT NULL,
@@ -21,57 +24,57 @@ create table User (
     password varchar(1000) NOT NULL,
     PRIMARY KEY (UserID)
 );
-
+-- Query Sep
 create table Employee (
-    EmployeeID varchar(20) NOT NULL,
-    BranchID varchar(20) NOT NULL,
-    UserID varchar(20) NOT NULL,
+    EmployeeID int NOT NULL auto_increment,
+    BranchID int NOT NULL,
+    UserID int NOT NULL,
     Position varchar(30) check (Position in ('Branch_Manager', 'Other')),
     IsManager BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (EmployeeID),
     FOREIGN KEY (BranchID) references Branch(BranchID),
     FOREIGN KEY (UserID) references User(UserID) on delete cascade
 );
-
+-- Query Sep
 create table Customer (
-    CustomerID varchar(20) NOT NULL,
+    CustomerID int NOT NULL auto_increment,
     NIC_BR varchar(30),
     DOB date,
     Address varchar(255),
     Phone varchar(15),
-    UserID varchar(20),
+    UserID int NOT NULL,
     CustomerType varchar(30) check (CustomerType in ('Individual', 'Organization')),
     PRIMARY KEY (CustomerID),
     FOREIGN KEY (UserID) references User(UserID) on delete cascade
 );
-
+-- Query Sep
 CREATE TABLE SavingsPlan (
   SavingsPlanType varchar(15) check (SavingsPlanType in ('Children', 'Teen', 'Adult', 'Senior')),
   InterestRate decimal(5, 2),
   MinimumBalance decimal(15,2),
   PRIMARY KEY (SavingsPlanType)
 );
-
+-- Query Sep
 CREATE TABLE Account (
     AccountNo varchar(20) NOT NULL,
-    CustomerID varchar(20) NOT NULL,
-    AccType varchar(10) check (AccType in ('Savings', 'Checking')) NOT NULL,
-    BranchID varchar(20) NOT NULL,
+    CustomerID int NOT NULL,
+    BranchID int NOT NULL,
     Balance decimal(15,2),
     SavingsPlanType varchar(20) check (SavingsPlanType in ('Children', 'Teen', 'Adult', 'Senior')),
-    ParentID varchar(20),
+    ParentID int ,
     PRIMARY KEY (AccountNo),
     FOREIGN KEY (ParentID) references Customer(CustomerID) on delete cascade,
     FOREIGN KEY (CustomerID) references Customer(CustomerID) on delete cascade,
     FOREIGN KEY (SavingsPlanType) references SavingsPlan(SavingsPlanType),
 	FOREIGN KEY (BranchID) references Branch(BranchID),
 	CHECK ((ParentID is not null and SavingsPlanType = 'Children') or (SavingsPlanType != 'Children' and ParentID is null)),
-    CHECK ((Balance >= 0 and AccType = 'Savings') or (Balance >= -100000 and AccType = 'Checking')),
-    CHECK ((SavingsPlanType is not null and AccType = 'Savings') or (SavingsPlanType is null and AccType = 'Checking'))
+    CHECK ((Balance >= -100000 and SavingsPlanType is null) or (Balance >= 0 and SavingsPlanType = 'Children') 
+    or (Balance >= 500 and SavingsPlanType = 'Teen') or (Balance >= 1000 and SavingsPlanType = 'Adult') 
+    or (Balance >= 1000 and SavingsPlanType = 'Senior'))
 );
-
+-- Query Sep
 create table Transaction (
-    TransactionID varchar(20) NOT NULL,
+    TransactionID int NOT NULL auto_increment,
     FromAccNo varchar(20),
     ToAccNo varchar(20),
     Description varchar(100) DEFAULT 'CEFT',
@@ -87,7 +90,7 @@ create table Transaction (
     CHECK (TrnType = 'Loan' and FromAccNo is null or TrnType != 'Loan' and FromAccNo is not null)
 );
 
-
+-- Query Sep
 CREATE TABLE FixedDeposit (
   FixedId varchar(20) NOT NULL,
   SavingsAccNo varchar(20) NOT NULL,
@@ -100,19 +103,19 @@ CREATE TABLE FixedDeposit (
   FOREIGN KEY (SavingsAccNo) REFERENCES Account(accountNo)
 );
 
-
+-- Query Sep
 CREATE TABLE LoanApplication (
-  LoanApplicationID varchar(20) NOT NULL,
+  LoanApplicationID int NOT NULL AUTO_INCREMENT,
   IsOnline BOOLEAN DEFAULT FALSE,
   FixedId varchar(20),
-  CustomerID varchar(20) NOT NULL,
-  BranchID varchar(20) NOT NULL,
+  CustomerID int NOT NULL,
+  BranchID int NOT NULL,
   Duration decimal(2) check (Duration in (6, 12, 18, 24, 36, 48, 60, 72, 84, 96, 108, 120)),
   Type varchar(15) check (Type in ('Business', 'Personal')),
   CreatedTimeStamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CreatedBy varchar(20),
+  CreatedBy int,
   CheckedDate date,
-  CheckedBy varchar(20),
+  CheckedBy int,
   Amount decimal(15,2),
   Status varchar(10) check (Status in ('Pending', 'Approved', 'Rejected')),
   PRIMARY KEY (LoanApplicationID), 
@@ -121,15 +124,17 @@ CREATE TABLE LoanApplication (
   FOREIGN KEY (CheckedBy) REFERENCES Employee(EmployeeID),
   FOREIGN KEY (FixedId) REFERENCES FixedDeposit(FixedId),
   FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-  check (IsOnline = 1 and FixedId is not null or IsOnline = 0 and FixedId is null),
+  CHECK ((ISOnline = 1 and CreatedBy is NULL and CheckedBy is NULL )OR (IsOnline = 0 and CreatedBy is not null)),
+  CHECK ((Status = 'Pending' and CheckedBy is null) or Status != 'Pending' ),
+  check ((IsOnline = 1 and FixedId is not null) or (IsOnline = 0 and FixedId is null)),
   CHECK ((isOnline = 1 and Status != 'Pending') or (isOnline =0))
 );
 
-
+-- Query Sep
 CREATE TABLE Loan (
-  LoanID varchar(20) NOT NULL,
-  CustomerID varchar(20) NOT NULL,
-  LoanApplicationID varchar(20) NOT NULL,
+  LoanID int NOT NULL AUTO_INCREMENT,
+  CustomerID int NOT NULL,
+  LoanApplicationID int NOT NULL,
   Amount decimal(15,2),
   StartDate date,
   EndDate date,
@@ -143,25 +148,26 @@ CREATE TABLE Loan (
   FOREIGN KEY (FixedId) REFERENCES FixedDeposit(FixedId),
   check (IsOnline = 1 and FixedId is not null or IsOnline = 0 and FixedId is null)
 );
-
+-- Query Sep
 CREATE TABLE LoanInterestRate (
   Duration decimal(2) check (Duration in (6, 12, 18, 24, 36, 48, 60, 72, 84, 96, 108, 120)),
   Type varchar(15) check (Type in ('Business', 'Personal')),
   InterestRate decimal(5,2),
   PRIMARY KEY (Duration, Type)
 );
-
+-- Query Sep
 CREATE TABLE LoanInstallment (
-  LoanID varchar(20) NOT NULL,
+  LoanID int NOT NULL,
   PaymentDate date,
   DueDate date NOT NULL,
   Status varchar(10) check (Status in ('Pending', 'Paid', 'Overdue')),
   PRIMARY KEY (LoanID, DueDate),
   FOREIGN KEY (LoanID) REFERENCES Loan(LoanID)
 );
-
+-- Query Sep
 CREATE TABLE FixedDepositInterestRate (
   Duration decimal(2) NOT NULL check (Duration in (6, 12, 36)),
   InterestRate decimal(5,2),
   PRIMARY KEY (Duration)
 );
+-- Query Sep
