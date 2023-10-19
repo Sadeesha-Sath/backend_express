@@ -5,14 +5,14 @@ const findOne = async (id) => {
     sql: `SELECT * FROM EmployeeView WHERE e.EmployeeID=?`,
     values: [id],
   });
-  console.log(result[0]);
-  return result[0];
+  console.log(result[0][0]);
+  return result[0][0];
 };
 
 const findAll = async () => {
   const result = await query("SELECT * FROM EmployeeView ORDER BY EmployeeID");
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const findUserIDfromEmployeeID = async (employeeID) => {
@@ -21,7 +21,7 @@ const findUserIDfromEmployeeID = async (employeeID) => {
     values: [employeeID],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const findBranchIDfromEmployeeID = async (employeeID) => {
@@ -30,7 +30,7 @@ const findBranchIDfromEmployeeID = async (employeeID) => {
     values: [employeeID],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 module.exports = {

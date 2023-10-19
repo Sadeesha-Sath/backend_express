@@ -7,24 +7,24 @@ const findOne = async (id) => {
     values: [id],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const findAll = async () => {
   const result = await query(
     `SELECT UserID, Name, Username, Email, Role from User`
   );
-  console.log(result);
-  return result;
+  console.log(result[0]);
+  return result[0];
 };
 
 const findByUsername = async (username) => {
   const result = await escapedQuery({
-    sql: `SELECT UserID, Name, Username, Email, Password, Role from User where Username=?`,
+    sql: `SELECT UserID, Name, Username, Email, Password, Role from User where Username=? LIMIT 1`,
     values: [username],
   });
-  console.log(result[0]);
-  return result[0];
+  console.log(result);
+  return result[0][0];
 };
 
 const updateOne = async (id, data) => {
@@ -33,7 +33,7 @@ const updateOne = async (id, data) => {
     values: [data.name, data.username, data.email, data.id],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const changeAccess = async (id, data) => {
@@ -42,7 +42,7 @@ const changeAccess = async (id, data) => {
     values: [data.role, data.id],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const getPassword = async (id) => {
@@ -51,7 +51,7 @@ const getPassword = async (id) => {
     values: [id],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const changePassword = async (data) => {
@@ -61,17 +61,17 @@ const changePassword = async (data) => {
     values: [hashedPass, data.id],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
-const addUser = async (username, password) => {
-  const hashedPass = await generateHash(password);
+const addUser = async (data) => {
+  const hashedPass = await generateHash(data.password);
   const result = await escapedQuery({
-    sql: `INSERT INTO User (UserID, Name, Email, Username, Password) VALUES (NULL, ?, ?, ?, ?, ?);`,
-    values: [data.name, data.email, data.username, hashedPass],
+    sql: `INSERT INTO User (UserID, Name, Email, Username, Role, Password) VALUES (NULL, ?, ?, ?, ?, ?, ?);`,
+    values: [data.name, data.email, data.username, data.role, hashedPass],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const findEmployeeIDfromUserID = async (userID) => {
@@ -79,8 +79,8 @@ const findEmployeeIDfromUserID = async (userID) => {
     sql: `SELECT EmployeeID from Employee where UserID=?`,
     values: [userID],
   });
-  console.log(result[0]);
-  return result[0];
+  console.log(result[0][0]);
+  return result[0][0];
 };
 
 module.exports = {

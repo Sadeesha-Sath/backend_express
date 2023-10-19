@@ -10,7 +10,7 @@ const findAll = async (BranchID) => {
   }
   result = await query("SELECT * from LoanApplication");
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const findOne = async (id) => {
@@ -19,7 +19,7 @@ const findOne = async (id) => {
     values: [id],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const approveLoanApplication = async (id, userID) => {
@@ -28,7 +28,7 @@ const approveLoanApplication = async (id, userID) => {
     values: [id, userID],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const rejectLoanApplication = async (id, userID) => {
@@ -37,7 +37,7 @@ const rejectLoanApplication = async (id, userID) => {
     values: [id, userID],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const getBranchIDfromLoanApplication = async (loanApplicationID) => {
@@ -62,7 +62,7 @@ const addOnlineLoanApplication = async (data, userID) => {
     ],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const addOfflineLoanApplication = async (data, userID) => {
@@ -78,7 +78,7 @@ const addOfflineLoanApplication = async (data, userID) => {
     ],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 module.exports = {

@@ -224,10 +224,10 @@ DELIMITER ;
 DELIMITER $$
 DROP PROCEDURE IF EXISTS get_own_accounts$$
 -- Query Sep
-Delimiter $$
+DELIMITER $$
 CREATE PROCEDURE get_own_accounts (in userID int)
 BEGIN
-    SELECT AccountNo, CustomerID, BranchID, Balance, SavingsPlanType 
+    SELECT UserID, a.AccountNo, c.CustomerID, BranchID, Balance, SavingsPlanType 
 		FROM Account a INNER JOIN Customer c 
         ON c.CustomerID = a.CustomerID 
         WHERE c.UserID = userID;
@@ -244,7 +244,7 @@ CREATE PROCEDURE add_customer (in Name varchar(100), in Email varchar(100), in U
 in Password varchar(1000), in NIC_BR varchar(30), in Address varchar(155), in Phone varchar(15), 
 in CustomerType varchar(30) , in DOB date)
 BEGIN
-    INSERT INTO User (UserID, Name, Email, Username, Password) VALUES (NULL, Name, Email, Username, Password);
+    INSERT INTO User (UserID, Name, Email, Username, Role, Password) VALUES (NULL, Name, Email, Username, "customer", Password);
     INSERT INTO Customer (CustomerID, NIC_BR, Address, Phone, UserID, CustomerType, DOB) VALUES (NULL, NIC_BR, Address, Phone, last_insert_id(), CustomerType, DOB);
 END$$
 
