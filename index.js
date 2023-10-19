@@ -40,8 +40,4 @@ const port = process.env.PORT || 8080;
 app
   .listen(port, () => {
     console.log(`App is listnening on port ${port}`);
-  })
-  .catch((err) => {
-    console.error(err);
-    process.exit();
   });
