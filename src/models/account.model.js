@@ -10,7 +10,7 @@ const findAll = async (BranchID) => {
   }
   result = await query("SELECT * from Account");
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const findOne = async (id) => {
@@ -18,8 +18,8 @@ const findOne = async (id) => {
     sql: `SELECT * from Account where AccountID=?`,
     values: [id],
   });
-  console.log(result[0]);
-  return result[0];
+  console.log(result);
+  return result[0][0];
 };
 
 const findfromUser = async (userID) => {
@@ -28,7 +28,7 @@ const findfromUser = async (userID) => {
     values: [userID],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 module.exports = { findAll, findOne, findfromUser };
