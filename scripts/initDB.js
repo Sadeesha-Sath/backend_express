@@ -6,7 +6,7 @@ const path = require("path");
 
 const initDB = async () => {
   const dbSQL = fs
-    .readFileSync(path.resolve(__dirname, "./setup_db.sql"))
+    .readFileSync(path.resolve(__dirname, "./sql/setup_db.sql"))
     .toString();
   const dbArray = dbSQL.toString().trimStart().split("-- Query Sep");
 
@@ -25,7 +25,7 @@ const initDB = async () => {
     }
   }
   const viewSQL = fs
-    .readFileSync(path.resolve(__dirname, "./views.sql"))
+    .readFileSync(path.resolve(__dirname, "./sql/views.sql"))
     .toString();
   const viewArray = viewSQL.toString().trimStart().split("-- Query Sep");
 
@@ -45,7 +45,7 @@ const initDB = async () => {
   }
 
   const procSQL = fs
-    .readFileSync(path.resolve(__dirname, "./functionAndProcedures.sql"))
+    .readFileSync(path.resolve(__dirname, "./sql/functionAndProcedures.sql"))
     .toString();
   const procArray = procSQL.toString().trimStart().split("-- Query Sep");
 
@@ -65,7 +65,7 @@ const initDB = async () => {
   }
 
   const triggerSQL = fs
-    .readFileSync(path.resolve(__dirname, "./triggers.sql"))
+    .readFileSync(path.resolve(__dirname, "./sql/triggers.sql"))
     .toString();
   const triggerArray = triggerSQL.toString().trimStart().split("-- Query Sep");
 
@@ -85,7 +85,7 @@ const initDB = async () => {
   }
 
   const dataSQL = fs
-    .readFileSync(path.resolve(__dirname, "./insert_dummy_data.sql"))
+    .readFileSync(path.resolve(__dirname, "./sql/insert_dummy_data.sql"))
     .toString();
 
   const dataArray = dataSQL.toString().trimStart().split("-- Query Sep");

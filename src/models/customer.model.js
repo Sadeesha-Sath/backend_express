@@ -22,10 +22,10 @@ const findAll = async () => {
 };
 
 const addCustomer = async (data) => {
-  const password = data.password ? data.password : generateRandomPass();
+  const password = data.password ?? generateRandomPass();
   const hashedPass = await generateHash(password);
   const result = await escapedQuery({
-    sql: `SELECT * FROM add_customer(?, ?, ?, ?, ?, ?, ?, ?)`,
+    sql: `CALL add_customer(?, ?, ?, ?, ?, ?, ?, ?)`,
     values: [
       data.name,
       data.username,
@@ -37,7 +37,9 @@ const addCustomer = async (data) => {
       data.dob,
     ],
   });
-  result.password = password;
+  if (!data.password) {
+    result.password = password;
+  }
   console.log(result);
   return result;
 };

@@ -1,6 +1,8 @@
 const express = require("express");
 const { findByUsername, addUser } = require("@models/user.model");
 const { comparePasswords } = require("@utils/password_helper");
+const { addCustomer } = require("@models/customer.model");
+const { findAll } = require("../models/user.model");
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -9,7 +11,12 @@ router.post("/login", async (req, res) => {
     const password = req.body.password;
     try {
       const user = await findByUsername(username);
-      if (user) {
+      console.log("USER IS" + user + " end");
+      if (
+        (Array.isArray(user) && user.length) ||
+        (!Array.isArray(user) && user)
+      ) {
+        console.log("Error Goes Here");
         if (comparePasswords(password, user.password)) {
           const { password, ...userToken } = user;
           const token = jwt.sign({ user: userToken }, process.env.API_SECRET, {
@@ -18,7 +25,7 @@ router.post("/login", async (req, res) => {
           res.status(200).send({
             message: "Login successful",
             user: userToken,
-            accessToken: token,
+            token: token,
           });
         } else {
           res
@@ -38,13 +45,16 @@ router.post("/login", async (req, res) => {
 
 router.post("/signup", async (req, res) => {
   if (req.body.username && req.body.password) {
-    const username = req.body.username;
-    const password = req.body.password;
     try {
-      const user = await findByUsername(username);
-      if (!user) {
-        const result = await addUser(username, password);
-        res.status(200).send({ message: "User created" });
+      const user = await findByUsername(req.body.username);
+      if (
+        (Array.isArray(user) && user.length === 0) ||
+        (!Array.isArray(user) && !user)
+      ) {
+        const result = await addCustomer(req.body);
+        res
+          .status(200)
+          .send({ message: "Customer User created", result: result });
       } else {
         res.status(400).send({
           message:

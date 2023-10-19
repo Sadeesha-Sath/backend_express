@@ -3,7 +3,7 @@ const { query, escapedQuery } = require("@services/db.service.js");
 const findAll = async () => {
   const result = await query("SELECT * from Branch");
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const findOne = async (id) => {
@@ -12,7 +12,7 @@ const findOne = async (id) => {
     values: [id],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const findManager = async (id) => {
@@ -21,7 +21,7 @@ const findManager = async (id) => {
     values: [id],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 // const addBranch = async (data) => {

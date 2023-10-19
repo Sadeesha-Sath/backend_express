@@ -6,7 +6,7 @@ const findOwn = async (acc) => {
     values: [acc, acc],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const findOne = async (id) => {
@@ -15,13 +15,13 @@ const findOne = async (id) => {
     values: [id],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const findAll = async (id) => {
   const result = await query("SELECT * from Transaction");
   console.log(result);
-  return result;
+  return result[0];
 };
 
 const findUserIDfromTransactionID = async (transactionID) => {
@@ -30,13 +30,13 @@ const findUserIDfromTransactionID = async (transactionID) => {
     values: [transactionID],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const addTransaction = async (data) => {
   const result = await escapedQuery({
     sql: `
-        SELECT * FROM add_trn(?, ?, ?, ?, ?);
+        CALL add_trn(?, ?, ?, ?, ?);
         `,
     values: [
       data.fromAccNo,
@@ -47,7 +47,7 @@ const addTransaction = async (data) => {
     ],
   });
   console.log(result);
-  return result;
+  return result[0];
 };
 
 module.exports = {
