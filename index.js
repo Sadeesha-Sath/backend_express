@@ -14,6 +14,7 @@ require("dotenv").config();
 const db = require("./src/services/db.service");
 const sql_q = 'Select BranchID, BranchName from branch';
 const sql_view = 'SELECT * FROM monthlytransactioncountview';
+const getTransactions_sql = 'CALL GetTransactionData(?);'
 
 
 // Routes
@@ -29,6 +30,7 @@ app.use(
 );
 app.use("/users", verifyToken, require("./src/routes/user.routes"));
 
+
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
@@ -41,9 +43,14 @@ app.get("/branches", async (req, res) =>{
 })
 
 //need to be fixed
-app.get("/view", async(req, res)=>{
-  const views = await db.query(sql_view);
-  res.send(views);
+app.post("/view", async(req, res)=>{
+  const branchId = req.body.brId;
+  const views = await db.escapedQuery({
+    sql: getTransactions_sql,
+    values: [branchId]
+  });
+  res.json(views);
+  
 })
 
 
