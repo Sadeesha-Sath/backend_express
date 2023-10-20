@@ -18,7 +18,11 @@ const generateHash = async (password) => {
 };
 
 const comparePasswords = async (userPass, storedPass) => {
-  return await bcrypt.compare(userPass, storedPass);
-}
+  try {
+    return await bcrypt.compare(userPass, storedPass);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 module.exports = { generateRandomPass, generateHash, comparePasswords };
