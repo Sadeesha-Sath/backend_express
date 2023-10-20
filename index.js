@@ -9,7 +9,12 @@ app.use(express.urlencoded({ extended: true }));
 
 require("dotenv").config();
 
+
+
 const db = require("./src/services/db.service");
+const sql_q = 'Select BranchID, BranchName from branch';
+const sql_view = 'SELECT * FROM monthlytransactioncountview';
+
 
 // Routes
 
@@ -27,6 +32,21 @@ app.use("/users", verifyToken, require("./src/routes/user.routes"));
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
+
+
+//need to be fixed
+app.get("/branches", async (req, res) =>{
+  const branches = await db.query(sql_q);
+  res.send(branches);
+})
+
+//need to be fixed
+app.get("/view", async(req, res)=>{
+  const views = await db.query(sql_view);
+  res.send(views);
+})
+
+
 
 // 404 Not found
 app.use("*", (req, res, next) => {
