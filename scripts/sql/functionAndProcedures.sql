@@ -1,8 +1,6 @@
 
 Delimiter $$
 DROP procedure IF EXISTS add_trn$$
--- Query Sep
-Delimiter $$
 CREATE PROCEDURE add_trn(in fromAccNo varchar(20), in toAccNo varchar(20), in amount decimal(15,2), in trnType varchar(20), in description varchar(100))
 BEGIN
 	START TRANSACTION;
@@ -11,7 +9,7 @@ BEGIN
     IF (trnType = 'Online') THEN
         -- Check if the account has exceeded the monthly withdrawal limit
         IF (@savingType  is not null) THEN
-            SELECT count INTO @count FROM MonthlyTransactionCountView WHERE FromAccNo = fromAccNo LIMIT 1 FOR UPDATE;
+            SELECT MonthlyTransactionCount INTO @count FROM Account WHERE AccountNo = fromAccNo LIMIT 1 FOR UPDATE;
             IF @count is null or @count > 5 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Monthly Transaction Limit Exceeded';
                 rollback;
@@ -23,6 +21,7 @@ BEGIN
             rollback;
         END IF;
         INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, toAccNo, amount, 'Online', description);
+        UPDATE Account SET MonthlyTransactionCount = MonthlyTransactionCount + 1 WHERE AccountNo = fromAccNo;
 
     -- If it's a loan transfer
     ELSEIF (trnType = 'Loan') THEN
@@ -31,7 +30,7 @@ BEGIN
     ELSEIF (trnType = 'ATM') THEN
         -- Check if the account has exceeded the monthly withdrawal limit
         IF @savingType is not null THEN
-            SELECT count INTO @count FROM MonthlyTransactionCountView WHERE FromAccNo = fromAccNo LIMIT 1 FOR UPDATE;
+            SELECT MonthlyTransactionCount INTO @count FROM Account WHERE AccountNo = fromAccNo LIMIT 1 FOR UPDATE;
             IF @count is null or @count > 5 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Monthly Transaction Limit Exceeded';
                 rollback;
@@ -44,11 +43,10 @@ BEGIN
         END IF;
         INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, NULL, amount, trnType, description);
         INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, NULL, amount, 'TrnFee', "Transaction Fee for TransactionID: " + LAST_INSERT_ID());
+        UPDATE Account SET MonthlyTransactionCount = MonthlyTransactionCount + 1 WHERE AccountNo = fromAccNo;
     END IF;
     COMMIT;
 END$$
-
-Delimiter ;
 
 -- Query Sep	
 
@@ -223,11 +221,9 @@ DELIMITER ;
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS get_own_accounts$$
--- Query Sep
-DELIMITER $$
 CREATE PROCEDURE get_own_accounts (in userID int)
 BEGIN
-    SELECT UserID, a.AccountNo, c.CustomerID, BranchID, Balance, SavingsPlanType 
+    SELECT UserID, a.AccountNo, c.CustomerID, BranchID, Balance, SavingsPlanType, MonthlyTransactionCount 
 		FROM Account a INNER JOIN Customer c 
         ON c.CustomerID = a.CustomerID 
         WHERE c.UserID = userID;

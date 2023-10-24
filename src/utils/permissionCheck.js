@@ -9,12 +9,14 @@ const permissions = {
     "ADD_EMPLOYEE",
     "ADD_CUSTOMER",
     "ADD_TRANSACTION",
+    "ALL_ACCOUNTS",
   ],
   employee: [
     "ALL_CUSTOMERS",
     "ALL_TRANSACTIONS",
     "ADD_CUSTOMER",
     "ADD_TRANSACTION",
+    "ALL_ACCOUNTS",
   ],
   branch_manager: [
     "ALL_USERS",
@@ -24,13 +26,14 @@ const permissions = {
     "ADD_EMPLOYEE",
     "ADD_CUSTOMER",
     "ADD_TRANSACTION",
+    "ALL_ACCOUNTS",
   ],
   customer: [],
 };
 
 const permissionCheck = (access, user) => {
-  if (!user || !user.role) return false;
-  return permissions[user.role].includes(access);
+  if (!user || !user.Role) return false;
+  return permissions[user.Role].includes(access);
 };
 
 module.exports = permissionCheck;

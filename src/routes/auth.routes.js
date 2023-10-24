@@ -4,6 +4,7 @@ const { comparePasswords } = require("@utils/password_helper");
 const { addCustomer } = require("@models/customer.model");
 const { generateHash } = require("@utils/password_helper");
 const generateToken = require("../utils/tokenGenerator");
+const tokenVerification = require("../utils/tokenVerification");
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -15,10 +16,8 @@ router.post("/login", async (req, res) => {
         (!Array.isArray(user) && user)
       ) {
         if (comparePasswords(req.body.password, user.Password)) {
-          console.log("here");
           const { Password, ...userRest } = user;
-          console.log(process.env.API_SECRET);
-          const token = await generateToken(userRest);
+          const token = generateToken(userRest);
           res.status(200).send({
             message: "Login successful",
             user: userRest,
@@ -65,6 +64,19 @@ router.post("/signup", async (req, res) => {
   } else {
     res.status(400).send({ message: "Username and Password are required" });
   }
+});
+
+router.post("/verify", async (req, res) => {
+  if (req.body.token) {
+    const user = tokenVerification(req.body.token);
+    if (user) {
+      console.log("Token is valid");
+      res.status(200).send({ message: "Token is valid", user: user });
+      return;
+    }
+  }
+  console.log("Token is invalid");
+  res.status(401).send({ message: "Token is invalid" });
 });
 
 module.exports = router;

@@ -6,7 +6,7 @@ router.get("/", (req, res) => {
   if (permissionCheck("ALL_EMPLOYEES", req.user.id)) {
     findAll()
       .then((result) => {
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -28,7 +28,7 @@ router.get("/:id", (req, res) => {
           res.status(404).send({ message: "No such employee" });
           return;
         }
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -43,7 +43,7 @@ router.get("/:id", (req, res) => {
 //   if (permissionCheck("ADD_EMPLOYEE")) {
 //     addEmploye(req.body)
 //       .then((result) => {
-//         res.status(200).json(result);
+//         res.status(200).send(result);
 //       })
 //       .catch((err) => {
 //         console.error(err);
