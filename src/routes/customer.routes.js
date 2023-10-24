@@ -4,17 +4,22 @@ const { findAll, findOne, addCustomer } = require("@models/customer.model");
 const router = express.Router();
 
 router.get("/", (req, res) => {
+  console.log("At Customer Get");
   if (permissionCheck("ALL_CUSTOMERS", req.user)) {
+    console.log("In Customer Get");
     findAll()
       .then((result) => {
-        res.status(200).json(result);
+        res.status(200).send(result);
+        return;
       })
       .catch((err) => {
         console.error(err);
         res.status(500).send(err);
+        return;
       });
   } else {
     res.status(403).send({ message: "You don't have necessary permissions" });
+    return;
   }
 });
 
@@ -29,7 +34,7 @@ router.get("/:id", (req, res) => {
           res.status(404).send({ message: "No such customer" });
           return;
         }
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -44,7 +49,7 @@ router.post("/new", (req, res) => {
   if (permissionCheck("ADD_CUSTOMER", req.user)) {
     addCustomer(req.body)
       .then((result) => {
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);

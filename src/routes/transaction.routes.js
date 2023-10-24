@@ -33,7 +33,7 @@ router.get("/:id", (req, res) => {
           res.status(404).send({ message: "No such transaction" });
           return;
         }
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);

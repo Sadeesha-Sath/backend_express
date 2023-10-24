@@ -26,7 +26,7 @@ router.get("/", (req, res) => {
       ) {
         findAll(req.query.branchID)
           .then((result) => {
-            res.status(200).json(result);
+            res.status(200).send(result);
           })
           .catch((err) => {
             console.error(err);
@@ -43,7 +43,7 @@ router.get("/", (req, res) => {
     if (permissionCheck("ALL_LOAN_APPLICATIONS", req.user)) {
       findAll()
         .then((result) => {
-          res.status(200).json(result);
+          res.status(200).send(result);
         })
         .catch((err) => {
           console.error(err);
@@ -60,7 +60,7 @@ router.get("/:id", (req, res) => {
   if (permissionCheck("ALL_LOAN_APPLICATION", req.user)) {
     findOne(req.params.id)
       .then((result) => {
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -79,7 +79,7 @@ router.get("/:id", (req, res) => {
         ) {
           findOne(req.params.id)
             .then((result) => {
-              res.status(200).json(result);
+              res.status(200).send(result);
             })
             .catch((err) => {
               console.error(err);
@@ -107,7 +107,7 @@ router.post("/:id/approve", (req, res) => {
         if (result.branchID != userRes.branchID) {
           approveLoanApplication(req.params.id, req.user.userID)
             .then((result) => {
-              res.status(200).json(result);
+              res.status(200).send(result);
             })
             .catch((err) => {
               console.error(err);
@@ -131,7 +131,7 @@ router.post("/:id/reject", (req, res) => {
         if (result.branchID != userRes.branchID) {
           rejectLoanApplication(req.params.id, req.user.userID)
             .then((result) => {
-              res.status(200).json(result);
+              res.status(200).send(result);
             })
             .catch((err) => {
               console.error(err);
@@ -149,7 +149,7 @@ router.post("/new", (req, res) => {
     if (permissionCheck("ADD_ONLINE_LOAN_APPLICATION", req.user)) {
       addOnlineLoanApplication(req.body, req.user.userID)
         .then((result) => {
-          res.status(200).json(result);
+          res.status(200).send(result);
         })
         .catch((err) => {
           console.error(err);
@@ -162,7 +162,7 @@ router.post("/new", (req, res) => {
   if (permissionCheck("ADD_OFFLINE_LOAN_APPLICATION", req.user)) {
     addOfflineLoanApplication(req.body, req.user.userID)
       .then((result) => {
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);

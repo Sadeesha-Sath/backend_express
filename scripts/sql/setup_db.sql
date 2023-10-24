@@ -19,8 +19,8 @@ create table User (
     UserID int NOT NULL auto_increment,
     Name varchar(100),
     Role varchar(30) CHECK (Role in ('admin', 'b_manager', 'employee', 'customer')) NOT NULL,
-    Username varchar(50) NOT NULL,
-    Email varchar(100),
+    Username varchar(50) NOT NULL UNIQUE,
+    Email varchar(100) NOT NULL UNIQUE,
     password varchar(1000) NOT NULL,
     PRIMARY KEY (UserID)
 );
@@ -62,6 +62,7 @@ CREATE TABLE Account (
     Balance decimal(15,2),
     SavingsPlanType varchar(20) check (SavingsPlanType in ('Children', 'Teen', 'Adult', 'Senior')),
     ParentID int ,
+    MonthlyTransactionCount int default 0,
     PRIMARY KEY (AccountNo),
     FOREIGN KEY (ParentID) references Customer(CustomerID) on delete cascade,
     FOREIGN KEY (CustomerID) references Customer(CustomerID) on delete cascade,
@@ -160,7 +161,7 @@ CREATE TABLE LoanInstallment (
   LoanID int NOT NULL,
   PaymentDate date,
   DueDate date NOT NULL,
-  Status varchar(10) check (Status in ('Pending', 'Paid', 'Overdue')),
+  Status varchar(10) check (Status in ('Pending', 'Paid', 'Overdue')) DEFAULT 'Pending',
   PRIMARY KEY (LoanID, DueDate),
   FOREIGN KEY (LoanID) REFERENCES Loan(LoanID)
 );

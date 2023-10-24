@@ -7,7 +7,7 @@ router.get("/", (req, res) => {
   if (permissionCheck("ALL_BRANCHES", req.user)) {
     findAll()
       .then((result) => {
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -26,7 +26,7 @@ router.get("/:id", (req, res) => {
           res.status(404).send({ message: "No such Branch" });
           return;
         }
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -36,3 +36,5 @@ router.get("/:id", (req, res) => {
     res.status(403).send({ message: "You don't have necessary permissions" });
   }
 });
+
+module.exports = router;
