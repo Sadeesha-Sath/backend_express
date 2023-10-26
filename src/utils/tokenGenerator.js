@@ -1,15 +1,15 @@
 const jwt = require("jsonwebtoken");
 
 const generateToken = (user) => {
-  console.log(process.env.NODE_ENV);
+  const curr_env = process.env.NODE_ENV;
 
   return jwt.sign({ user: user }, process.env.API_SECRET, {
     expiresIn:
-      process.env.NODE_ENV == "PROD"
-        ? process.env.PROD_TOKEN_EXPIRY
-        : process.env.NODE_ENV == "DEV"
-        ? process.env.DEV_TOKEN_EXPIRY
-        : process.env.DEFULT_TOKEN_EXPIRY, // 1 hour
+      curr_env === "PROD"
+        ? process.env.PROD_TOKEN_EXPIRY // 1 hour
+        : curr_env === "DEV"
+        ? process.env.DEV_TOKEN_EXPIRY // 10 days
+        : process.env.DEFULT_TOKEN_EXPIRY, // 1 day
   });
 };
 

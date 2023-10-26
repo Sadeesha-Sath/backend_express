@@ -1,8 +1,7 @@
 const express = require("express");
-const { findByUsername, addUser } = require("@models/user.model");
+const { findByUsername } = require("@models/user.model");
 const { comparePasswords } = require("@utils/password_helper");
 const { addCustomer } = require("@models/customer.model");
-const { generateHash } = require("@utils/password_helper");
 const generateToken = require("../utils/tokenGenerator");
 const tokenVerification = require("../utils/tokenVerification");
 const router = express.Router();
@@ -40,8 +39,27 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/checkUsername", async (req, res) => {
+  if (req.body.username) {
+    try {
+      const user = await findByUsername(req.body.username);
+      res.status(200).send({
+        available: Boolean(
+          (Array.isArray(user) && user.length !== 0) ||
+            (!Array.isArray(user) && !user)
+        ),
+        message: "Username not available",
+      });
+      return;
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ message: err });
+    }
+  }
+});
+
 router.post("/signup", async (req, res) => {
-  if (req.body.username && req.body.password) {
+  if (req.body.username && req.body.email && req.body.password) {
     try {
       const user = await findByUsername(req.body.username);
       if (
@@ -49,9 +67,13 @@ router.post("/signup", async (req, res) => {
         (!Array.isArray(user) && !user)
       ) {
         const result = await addCustomer(req.body);
-        res
-          .status(200)
-          .send({ message: "Customer User created", result: result });
+        if (result) {
+          res
+            .status(200)
+            .send({ message: "Customer User created", result: result });
+        } else {
+          res.status(500).send({ message: "Error" });
+        }
       } else {
         res.status(400).send({
           message:
