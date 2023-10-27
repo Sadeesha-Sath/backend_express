@@ -31,17 +31,6 @@ BranchID, Balance, SavingsPlanType, InterestRate, MinimumBalance
 FROM SavingsAccountView WHERE SavingsPlanType = 'Children';
 -- Query Sep
 
-DROP VIEW IF EXISTS MonthlyTransactionCountView;
--- Query Sep
-CREATE VIEW MonthlyTransactionCountView AS
-SELECT a.AccountNo as AccountNo, 
-COUNT(
-t.TrnType in ('Online', 'ATM') 
-AND MONTH(t.TimeStamp) = MONTH(CURDATE()) 
-AND YEAR(t.TimeStamp) = YEAR(CURDATE()) ) AS Count
-FROM Transaction t RIGHT OUTER JOIN Account a ON t.FromAccNo = a.AccountNo 
-GROUP BY a.AccountNo ORDER BY a.AccountNo;
--- Query Sep
 
 DROP VIEW IF EXISTS PendingLoanApplicationsView;
 -- Query Sep
@@ -50,9 +39,14 @@ SELECT * From LoanApplication WHERE Status = 'Pending';
 -- Query Sep
 
 DROP VIEW IF EXISTS PayableLoanInstallmentsView;
+
 -- Query Sep
 CREATE VIEW PayableLoanInstallmentsView AS 
-SELECT * From LoanInstallement WHERE Status in ('Pending', 'Overdue');
+SELECT LoanID, CustomerID, PaymentDate, DueDate, BranchID From 
+LoanInstallment li
+LEFT JOIN loanapplication la
+	ON li.LoanId = la.LoanApplicationID
+WHERE f.status in ('Pending', 'Overdue')
 
 -- Query Sep
 
