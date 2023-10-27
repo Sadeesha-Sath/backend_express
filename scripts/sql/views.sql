@@ -41,7 +41,7 @@ SELECT * From LoanApplication WHERE Status = 'Pending';
 DROP VIEW IF EXISTS PayableLoanInstallmentsView;
 -- Query Sep
 CREATE VIEW PayableLoanInstallmentsView AS 
-SELECT * From LoanInstallement WHERE Status in ('Pending', 'Overdue');
+SELECT * From LoanInstallment WHERE Status in ('Pending', 'Overdue');
 
 -- Query Sep
 
