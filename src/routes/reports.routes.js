@@ -17,7 +17,8 @@ router.get("/branches", async (req, res) =>{
 router.post("/view", async(req, res)=>{
   try{
     const branchId = req.body.brId;
-    const views = await getView(branchId);
+    const reportType = req.body.reportType;
+    const views = await getView(branchId, reportType);
     res.json(views);
   } catch(err){
     res.status(500).send("Unable to fetch data");
