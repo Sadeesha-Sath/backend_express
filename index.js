@@ -25,8 +25,14 @@ app.use(
   verifyToken,
   require("./src/routes/transaction.routes")
 );
+
 app.use("/users", verifyToken, require("./src/routes/user.routes"));
-app.use("/report", require("./src/routes/reports.routes"))   //verifying token must be fixed
+
+
+//verifying token must be fixed
+app.use("/report", require("./src/routes/reports.routes"))
+app.use("/fundtransfer", require("./src/routes/fundtransfer.routes"))   
+app.use("/interest", require("./src/routes/fixinterest.routes"))
 
 
 app.get("/", (req, res) => {
