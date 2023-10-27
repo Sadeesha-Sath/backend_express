@@ -59,3 +59,12 @@ UNION
 SELECT AccountNo, Balance, -100000, SavingsPlanType
 FROM Account WHERE SavingsPlanType is null;
 -- Query Sep
+
+DROP VIEW IF EXISTS TransactionView;
+-- Query Sep
+CREATE VIEW MinimumBalanceView AS
+SELECT a.AccountNo as AccountNo, a.Balance as Balance, s.MinimumBalance as MinimumBalance, a.SavingsPlanType
+FROM Account a INNER JOIN SavingsPlan s ON a.SavingsPlanType = s.SavingsPlanType
+UNION
+SELECT AccountNo, Balance, -100000, SavingsPlanType
+FROM Account WHERE SavingsPlanType is null;
