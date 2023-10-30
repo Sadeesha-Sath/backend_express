@@ -20,6 +20,7 @@ app.use("/employees", verifyToken, require("@routes/employee.routes"));
 app.use("/transactions", verifyToken, require("@routes/transaction.routes"));
 app.use("/users", verifyToken, require("@routes/user.routes"));
 app.use("/accounts", verifyToken, require("@routes/account.routes"));
+app.use("/branches", verifyToken, require("@routes/branch.routes.js"));
 
 app.get("/", (req, res) => {
   res.send("Hello World");

@@ -6,6 +6,12 @@ const findAll = async () => {
   return result[0];
 };
 
+const findAllMinimal = async () => {
+  const result = await query("SELECT BranchID, BranchName from Branch");
+  console.log(result);
+  return result[0];
+};
+
 const findOne = async (id) => {
   const result = await escapedQuery({
     sql: `SELECT * from Branch where BranchID=?`,
@@ -33,4 +39,4 @@ const findManager = async (id) => {
 //   return result;
 // };
 
-module.exports = { findAll, findOne, findManager };
+module.exports = { findAll, findOne, findManager, findAllMinimal };

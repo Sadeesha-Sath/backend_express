@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   if (permissionCheck("ALL_ACCOUNTS", req.user)) {
-    const result = await findAll(req.query.BranchID);
+    const result = await findAll(req.query);
     res.status(200).send(result);
   } else {
     res.status(403).send({ message: "You don't have necessary permissions" });
@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 
 router.get("/my", async (req, res) => {
   if (req.user.role == "customer") {
-    const result = await findFromUser(req.user.id);
+    const result = await findFromUser(req.user.id, req.query);
     res.status(200).send(result);
   } else {
     res.status(403).send({ message: "Only Customers can get there accounts" });
