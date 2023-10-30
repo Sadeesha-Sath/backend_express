@@ -1,4 +1,4 @@
-CREATE EVENT IF NOT EXISTS add_installements
+CREATE EVENT IF NOT EXISTS add_installments
 	ON schedule EVERY 1 MONTH
     STARTS '2023-11-01 00:00:00'
     COMMENT "Adds the Installements to the table on the start of every month"
@@ -12,7 +12,7 @@ CREATE EVENT IF NOT EXISTS mark_overdue_installments
     DO
 		UPDATE LoanInstallment SET
         Status = 'Overdue' WHERE DueDate < curdate();
-
+        
 CREATE EVENT IF NOT EXISTS reset_trn_count
 	ON schedule EVERY 1 MONTH
     STARTS '2023-11-01 00:00:00'
