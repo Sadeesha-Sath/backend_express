@@ -2,7 +2,7 @@ const { query, escapedQuery } = require("@services/db.service.js");
 
 const findOne = async (id) => {
   const result = await escapedQuery({
-    sql: `SELECT * FROM EmployeeView WHERE e.EmployeeID=?`,
+    sql: `SELECT * FROM EmployeeView WHERE EmployeeID=?`,
     values: [id],
   });
   console.log(result[0][0]);
