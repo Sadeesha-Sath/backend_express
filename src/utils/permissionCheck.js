@@ -10,6 +10,9 @@ const permissions = {
     "ADD_CUSTOMER",
     "ADD_TRANSACTION",
     "ALL_ACCOUNTS",
+    "ALL_FD",
+    "ALL_LOANS",
+    "ALL_BRANCHES",
   ],
   employee: [
     "ALL_CUSTOMERS",
@@ -17,6 +20,9 @@ const permissions = {
     "ADD_CUSTOMER",
     "ADD_TRANSACTION",
     "ALL_ACCOUNTS",
+    "ALL_FD",
+    "ALL_LOANS",
+    "ALL_BRANCHES",
   ],
   branch_manager: [
     "ALL_USERS",
@@ -27,6 +33,9 @@ const permissions = {
     "ADD_CUSTOMER",
     "ADD_TRANSACTION",
     "ALL_ACCOUNTS",
+    "ALL_FD",
+    "ALL_LOANS",
+    "ALL_BRANCHES",
   ],
   customer: [],
 };

@@ -26,7 +26,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   if (
     permissionCheck("ALL_CUSTOMERS", req.user) ||
-    isOwnCustomer(id, req.user.userID)
+    isOwnCustomer(id, req.user.UserID)
   ) {
     findOne(req.params.id)
       .then((result) => {

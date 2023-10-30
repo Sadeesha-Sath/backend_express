@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   let result;
   try {
-    if (req.query.acc && isOwnAccount(req.query.acc, req.user.id)) {
+    if (req.query.acc && isOwnAccount(req.query.acc, req.user.UserID)) {
       result = await findOwn(req.query.acc);
     } else if (permissionCheck("ALL_TRANSACTIONS", req.user)) {
       result = await findAll();
@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", (req, res) => {
   if (
     permissionCheck("ALL_TRANSACTIONS", req.user) ||
-    isOwnAccount(req.query.acc, req.user.id)
+    isOwnAccount(req.query.acc, req.user.UserID)
   ) {
     findOne(req.params.id)
       .then((result) => {

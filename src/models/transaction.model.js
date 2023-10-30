@@ -24,15 +24,6 @@ const findAll = async (id) => {
   return result[0];
 };
 
-const findUserIDfromTransactionID = async (transactionID) => {
-  const result = await escapedQuery({
-    sql: `SELECT c.UserID from Transaction t inner join Customer c where t.TransactionID=?`,
-    values: [transactionID],
-  });
-  console.log(result[0]);
-  return result[0][0];
-};
-
 const addTransaction = async (data) => {
   const result = await escapedQuery({
     sql: `
@@ -54,6 +45,5 @@ module.exports = {
   findAll,
   findOwn,
   findOne,
-  findUserIDfromTransactionID,
   addTransaction,
 };

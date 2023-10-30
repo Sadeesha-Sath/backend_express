@@ -25,14 +25,15 @@ const findOne = async (id) => {
   return result[0][0];
 };
 
-const findfromUser = async (userID, queryParams) => {
-  console.log(queryParams);
+const findFromUser = async (userID) => {
   const result = await escapedQuery({
-    sql: `SELECT * FROM AccountView a INNER JOIN Customer c ON c.CustomerID = a.CustomerID WHERE c.UserID=?`,
+    sql: `SELECT * FROM AccountView WHERE UserID=?`,
     values: [userID],
   });
   console.log(result);
   return result[0];
 };
 
-module.exports = { findAll, findOne, findfromUser };
+
+
+module.exports = { findAll, findOne, findFromUser };

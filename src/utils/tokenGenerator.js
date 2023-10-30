@@ -5,11 +5,13 @@ const generateToken = (user) => {
 
   return jwt.sign({ user: user }, process.env.API_SECRET, {
     expiresIn:
-      curr_env === "PROD"
+      curr_env === undefined
+        ? 3600
+        : curr_env === "PROD"
         ? process.env.PROD_TOKEN_EXPIRY // 1 hour
         : curr_env === "DEV"
         ? process.env.DEV_TOKEN_EXPIRY // 10 days
-        : process.env.DEFULT_TOKEN_EXPIRY, // 1 day
+        : process.env.DEFAULT_TOKEN_EXPIRY, // 1 day
   });
 };
 
