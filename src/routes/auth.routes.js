@@ -1,7 +1,7 @@
 const express = require("express");
 const { findByUsername } = require("@models/user.model");
 const { comparePasswords } = require("@utils/password_helper");
-const { addCustomer } = require("@models/customer.model");
+const { addCustomer, findCustomerByNIC } = require("@models/customer.model");
 const generateToken = require("../utils/tokenGenerator");
 const tokenVerification = require("../utils/tokenVerification");
 const { generateHash } = require("../utils/password_helper");
@@ -51,6 +51,27 @@ router.post("/checkUsername", async (req, res) => {
         ),
         message: "Username not available",
       });
+      return;
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ message: err });
+    }
+  }
+});
+
+router.post("/checkNic", async (req, res) => {
+  if (req.body.nic) {
+    try {
+      const user = await findCustomerByNIC(req.body.nic);
+      //console.log(user);
+      res.status(200).send({
+        available: Boolean(
+          (Array.isArray(user) && user.length !== 0) ||
+            (!Array.isArray(user) && !user)
+        ),
+        message: "Customer does not exist",
+      });
+      console.log(res.message);
       return;
     } catch (err) {
       console.log(err);
