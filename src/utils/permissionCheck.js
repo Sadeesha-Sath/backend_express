@@ -37,7 +37,7 @@ const permissions = {
     "ALL_LOANS",
     "ALL_BRANCHES",
   ],
-  customer: [],
+  customer: ["MY_TRANSACTIONS", "MY_LOANS"],
 };
 
 const permissionCheck = (access, user) => {

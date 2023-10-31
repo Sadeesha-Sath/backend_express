@@ -1,9 +1,9 @@
 const { query, escapedQuery } = require("@services/db.service.js");
 
-const findOwn = async (acc) => {
+const findOwn = async (userID) => {
   const result = await escapedQuery({
-    sql: `(SELECT * from Transaction where FromAccNo=?) UNION (SELECT * FROM Transaction where ToAccNo=?)`,
-    values: [acc, acc],
+    sql: `SELECT * from TransactionView where UserID=?`,
+    values: [userID],
   });
   console.log(result);
   return result[0];
@@ -18,7 +18,7 @@ const findOne = async (id) => {
   return result[0][0];
 };
 
-const findAll = async (id) => {
+const findAll = async () => {
   const result = await query("SELECT * from Transaction");
   console.log(result);
   return result[0];
