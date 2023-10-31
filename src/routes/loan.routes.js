@@ -1,39 +1,45 @@
 const express = require("express");
 const permissionCheck = require("@utils/permissionCheck");
-const { findAll, findOne, findFromUser } = require("@models/account.model");
-const { isOwnAccount } = require("@models/isOwnData");
+const {
+  findAll,
+  findActiveLoans,
+  findOne,
+  findOwn,
+  findOwnActiveLoans,
+} = require("@models/loan.model");
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  if (permissionCheck("ALL_ACCOUNTS", req.user)) {
+  if (permissionCheck("ALL_LOANS", req.user)) {
     const result = await findAll(req.query);
+    res.status(200).send(result);
+  } else if (permissionCheck("MY_LOANS", req.user)) {
+    const result = await findOwn(req.user.UserID);
     res.status(200).send(result);
   } else {
     res.status(403).send({ message: "You don't have necessary permissions" });
   }
 });
 
-router.get("/my", async (req, res) => {
-  if (req.user.Role == "customer") {
-    console.log("here at my");
-    const result = await findFromUser(req.user.UserID, req.query);
+router.get("/active", async (req, res) => {
+  if (permissionCheck("ALL_LOANS", req.user)) {
+    const result = await findActiveLoans(req.query);
+    res.status(200).send(result);
+  } else if (permissionCheck("MY_LOANS", req.user)) {
+    const result = await findOwnActiveLoans(req.user.UserID);
     res.status(200).send(result);
   } else {
-    res.status(403).send({ message: "Only Customers can get there accounts" });
+    res.status(403).send({ message: "You don't have necessary permissions" });
   }
 });
 
 router.get("/:id", (req, res) => {
-  console.log("here at id");
-  if (
-    permissionCheck("ALL_ACCOUNTS", req.user) ||
-    isOwnAccount(id, req.user.UserID)
-  ) {
+  if (permissionCheck("ALL_LOANS", req.user) || isOwnFD(id, req.user.UserID)) {
     findOne(req.params.id)
       .then((result) => {
         if (!result) {
-          res.status(404).send({ message: "No such Account" });
+          res.status(404).send({ message: "No such loan" });
           return;
         }
         res.status(200).send(result);
@@ -48,8 +54,8 @@ router.get("/:id", (req, res) => {
 });
 
 router.get("/ofUser/:id", async (req, res) => {
-  if (permissionCheck("ALL_ACCOUNTS", req.user)) {
-    const result = await findFromUser(req.params.id);
+  if (permissionCheck("ALL_FD", req.user)) {
+    const result = await findOwn(req.params.id);
     res.status(200).send(result);
   } else {
     res.status(403).send({ message: "You don't have necessary permissions" });

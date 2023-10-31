@@ -1,7 +1,7 @@
 const { query, escapedQuery } = require("@services/db.service.js");
 
 const findAll = async () => {
-  const result = await query("SELECT * from Branch");
+  const result = await query("SELECT * from BranchView");
   console.log(result);
   return result[0];
 };
@@ -14,7 +14,7 @@ const findAllMinimal = async () => {
 
 const findOne = async (id) => {
   const result = await escapedQuery({
-    sql: `SELECT * from Branch where BranchID=?`,
+    sql: `SELECT * from BranchView where BranchID=?`,
     values: [id],
   });
   console.log(result[0]);
@@ -23,7 +23,7 @@ const findOne = async (id) => {
 
 const findManager = async (id) => {
   const result = await escapedQuery({
-    sql: `SELECT * from Employee where e.BranchID=${id} and e.IsManager=1`,
+    sql: `SELECT * from Employee where e.BranchID=? and e.IsManager=1`,
     values: [id],
   });
   console.log(result[0]);
