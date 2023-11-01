@@ -239,30 +239,12 @@ END;
 END$$
 DELIMITER ;
 
--- DELIMITER $$
--- DROP PROCEDURE IF EXISTS get_own_accounts$$
--- CREATE PROCEDURE get_own_accounts (in userID int)
--- BEGIN
---     SELECT UserID, a.AccountNo, c.CustomerID, BranchID, Balance, SavingsPlanType, MonthlyTransactionCount 
--- 		FROM Account a INNER JOIN Customer c 
---         ON c.CustomerID = a.CustomerID 
---         WHERE c.UserID = userID;
--- END$$
--- DELIMITER ;
-
 DELIMITER $$
 DROP PROCEDURE IF EXISTS add_customer$$
 CREATE PROCEDURE add_customer (in Name varchar(100), in Email varchar(100), in Username varchar(50), 
 in Password varchar(1000), in NIC_BR varchar(30), in Address varchar(155), in Phone varchar(15), 
 in CustomerType varchar(30) , in DOB date)
 BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	GET DIAGNOSTICS CONDITION 1
-	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
-	ROLLBACK;
-END;
 	START TRANSACTION;
     INSERT INTO User (UserID, Name, Email, Username, Role, Password) VALUES (NULL, Name, Email, Username, "customer", Password);
     INSERT INTO Customer (CustomerID, NIC_BR, Address, Phone, UserID, CustomerType, DOB) VALUES (NULL, NIC_BR, Address, Phone, last_insert_id(), CustomerType, DOB);
@@ -271,4 +253,24 @@ END$$
 
 Delimiter ;
 
--- Query Sep
+
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS add_employee$$
+CREATE PROCEDURE add_employee (in Name varchar(100), in Email varchar(100), in Username varchar(50), 
+in Password varchar(1000), in BranchID int)
+BEGIN
+-- DECLARE EXIT HANDLER FOR SQLEXCEPTION
+-- BEGIN
+-- 	GET DIAGNOSTICS CONDITION 1
+-- 	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+-- 	ROLLBACK;
+--     SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+-- END;
+	START TRANSACTION;
+    INSERT INTO User (UserID, Name, Email, Username, Role, Password) VALUES (NULL, Name, Email, Username, "employee", Password);
+    INSERT INTO Employee (EmployeeID, BranchID, UserID, IsManager) VALUES (NULL, BranchID, last_insert_id(), 0);
+    COMMIT;
+END$$
+
+Delimiter ;

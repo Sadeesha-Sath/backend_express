@@ -35,11 +35,6 @@ app.use(
 app.use("/installments", verifyToken, require("@routes/installment.routes"));
 app.use("/interest", verifyToken, require("@routes/interest.routes"));
 
-
-
-//added by chamod need to fix
-app.use("/fundtransfer", verifyToken, require("@routes/fundtransfer.routes.js")) 
-
 app.get("/", (req, res) => {
   res.send("Hello World");
 });

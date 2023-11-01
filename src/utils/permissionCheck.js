@@ -18,22 +18,9 @@ const permissions = {
     "ALL_INSTALLMENTS",
     "ALL_INTERESTS"
   ],
-  employee: [
-    "ALL_CUSTOMERS",
-    "ALL_TRANSACTIONS",
-    "ADD_CUSTOMER",
-    "ADD_TRANSACTION",
-    "ALL_ACCOUNTS",
-    "ALL_FD",
-    "ALL_LOANS",
-    "ALL_BRANCHES",
-    "BRANCH_LOAN_APPLICATIONS",
-    "ALL_INSTALLMENTS",
-    "ALL_INTERESTS"
-  ],
   branch_manager: [
     "ALL_USERS",
-    "ALL_EMPLOYEES",
+    "ADD_EMPLOYEE",
     "ALL_CUSTOMERS",
     "ALL_TRANSACTIONS",
     "ADD_EMPLOYEE",
@@ -45,6 +32,19 @@ const permissions = {
     "ALL_BRANCHES",
     "BRANCH_LOAN_APPLICATIONS",
     "APPROVE_LOAN_APPLICATIONS",
+    "ALL_INSTALLMENTS",
+    "ALL_INTERESTS"
+  ],
+  employee: [
+    "ALL_CUSTOMERS",
+    "ALL_TRANSACTIONS",
+    "ADD_CUSTOMER",
+    "ADD_TRANSACTION",
+    "ALL_ACCOUNTS",
+    "ALL_FD",
+    "ALL_LOANS",
+    "ALL_BRANCHES",
+    "BRANCH_LOAN_APPLICATIONS",
     "ALL_INSTALLMENTS",
     "ALL_INTERESTS"
   ],

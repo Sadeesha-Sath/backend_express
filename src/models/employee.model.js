@@ -15,6 +15,21 @@ const findAll = async () => {
   return result[0];
 };
 
+const addEmployee = async (data) => {
+  const result = await escapedQuery({
+    sql: "call add_employee(?,?,?,?,?)",
+    values: [
+      data?.name,
+      data?.email,
+      data?.username,
+      data?.password,
+      data?.branchID,
+    ],
+  });
+  console.log(result);
+  return result[0];
+};
+
 const findBranchIDfromEmployeeID = async (employeeID) => {
   const result = await escapedQuery({
     sql: `SELECT BranchID from Employee where EmployeeID=?`,
@@ -38,4 +53,5 @@ module.exports = {
   findAll,
   findBranchIDfromEmployeeID,
   findEmployeeIDfromUserID,
+  addEmployee,
 };

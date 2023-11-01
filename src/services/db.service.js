@@ -8,6 +8,7 @@ const query = async (sql) => {
     const result = await pool.query(sql);
     return result;
   } catch (err) {
+    console.error(err.message);
     throw err;
   }
 };
@@ -21,7 +22,8 @@ const escapedQuery = async ({ sql, values }, timeout = 40000) => {
     });
     return result;
   } catch (err) {
-    console.log(err);
+    console.error(err.message);
+    throw err;
   }
 };
 
