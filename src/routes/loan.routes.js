@@ -6,6 +6,7 @@ const {
   findOne,
   findOwn,
   findOwnActiveLoans,
+  findInterests
 } = require("@models/loan.model");
 
 const router = express.Router();
@@ -30,6 +31,15 @@ router.get("/active", async (req, res) => {
     const result = await findOwnActiveLoans(req.user.UserID);
     res.status(200).send(result);
   } else {
+    res.status(403).send({ message: "You don't have necessary permissions" });
+  }
+});
+
+router.get("/interests", async (req, res) => {
+  if (permissionCheck("ALL_INTERESTS", req.user)) {
+    const result = await findInterests();
+    res.status(200).send(result);
+  }  else {
     res.status(403).send({ message: "You don't have necessary permissions" });
   }
 });
