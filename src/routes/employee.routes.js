@@ -1,12 +1,13 @@
 const express = require("express");
 const permissionCheck = require("@utils/permissionCheck");
 const router = express.Router();
+const { findAll, findOne } = require("@models/employee.model");
 
 router.get("/", (req, res) => {
-  if (permissionCheck("ALL_EMPLOYEES", req.user.id)) {
+  if (permissionCheck("ALL_EMPLOYEES", req.user)) {
     findAll()
       .then((result) => {
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -20,7 +21,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   if (
     permissionCheck("ALL_EMPLOYEES", req.user) ||
-    isOwnEmployee(id, req.user.id)
+    isOwnEmployee(req.params.id, req.user.UserID)
   ) {
     findOne(req.params.id)
       .then((result) => {
@@ -28,7 +29,7 @@ router.get("/:id", (req, res) => {
           res.status(404).send({ message: "No such employee" });
           return;
         }
-        res.status(200).json(result);
+        res.status(200).send(result);
       })
       .catch((err) => {
         console.error(err);
@@ -43,7 +44,7 @@ router.get("/:id", (req, res) => {
 //   if (permissionCheck("ADD_EMPLOYEE")) {
 //     addEmploye(req.body)
 //       .then((result) => {
-//         res.status(200).json(result);
+//         res.status(200).send(result);
 //       })
 //       .catch((err) => {
 //         console.error(err);

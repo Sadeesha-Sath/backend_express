@@ -1,30 +1,26 @@
 const express = require("express");
-const { findByUsername, addUser } = require("@models/user.model");
+const { findByUsername } = require("@models/user.model");
 const { comparePasswords } = require("@utils/password_helper");
 const { addCustomer } = require("@models/customer.model");
-const { findAll } = require("../models/user.model");
+const generateToken = require("../utils/tokenGenerator");
+const tokenVerification = require("../utils/tokenVerification");
+const { generateHash } = require("../utils/password_helper");
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
   if (req.body.username && req.body.password) {
-    const username = req.body.username;
-    const password = req.body.password;
     try {
-      const user = await findByUsername(username);
-      console.log("USER IS" + user + " end");
+      const user = await findByUsername(req.body.username);
       if (
         (Array.isArray(user) && user.length) ||
         (!Array.isArray(user) && user)
       ) {
-        console.log("Error Goes Here");
-        if (comparePasswords(password, user.password)) {
-          const { password, ...userToken } = user;
-          const token = jwt.sign({ user: userToken }, process.env.API_SECRET, {
-            expiresIn: 86400, // 1 day
-          });
+        if (await comparePasswords(req.body.password, user.Password)) {
+          const { Password, ...userRest } = user;
+          const token = generateToken(userRest);
           res.status(200).send({
             message: "Login successful",
-            user: userToken,
+            user: userRest,
             token: token,
           });
         } else {
@@ -36,15 +32,35 @@ router.post("/login", async (req, res) => {
         res.status(404).send({ message: "User not found", accessToken: null });
       }
     } catch (err) {
+      console.log(err);
       res.status(500).send({ message: err, accessToken: null });
     }
   } else {
-    res.status(400).send({ message: "Username and password are required" });
+    res.status(400).send({ message: "Username and Password are required" });
+  }
+});
+
+router.post("/checkUsername", async (req, res) => {
+  if (req.body.username) {
+    try {
+      const user = await findByUsername(req.body.username);
+      res.status(200).send({
+        available: Boolean(
+          (Array.isArray(user) && user.length !== 0) ||
+            (!Array.isArray(user) && !user)
+        ),
+        message: "Username not available",
+      });
+      return;
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ message: err });
+    }
   }
 });
 
 router.post("/signup", async (req, res) => {
-  if (req.body.username && req.body.password) {
+  if (req.body.username && req.body.email && req.body.password) {
     try {
       const user = await findByUsername(req.body.username);
       if (
@@ -52,9 +68,13 @@ router.post("/signup", async (req, res) => {
         (!Array.isArray(user) && !user)
       ) {
         const result = await addCustomer(req.body);
-        res
-          .status(200)
-          .send({ message: "Customer User created", result: result });
+        if (result) {
+          res
+            .status(200)
+            .send({ message: "Customer User created", result: result });
+        } else {
+          res.status(500).send({ message: "Error" });
+        }
       } else {
         res.status(400).send({
           message:
@@ -65,8 +85,21 @@ router.post("/signup", async (req, res) => {
       res.status(500).send({ message: err });
     }
   } else {
-    res.status(400).send({ message: "Username and password are required" });
+    res.status(400).send({ message: "Username and Password are required" });
   }
+});
+
+router.post("/verify", async (req, res) => {
+  if (req.body.token) {
+    const user = tokenVerification(req.body.token);
+    if (user) {
+      console.log("Token is valid");
+      res.status(200).send({ message: "Token is valid", user: user });
+      return;
+    }
+  }
+  console.log("Token is invalid");
+  res.status(401).send({ message: "Token is invalid" });
 });
 
 module.exports = router;

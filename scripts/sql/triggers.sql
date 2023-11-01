@@ -10,4 +10,5 @@ BEGIN
 		UPDATE Account SET Balance = Balance + NEW.Amount WHERE accountNo = NEW.ToAccNo;
 	END IF;
 END$$
--- Query Sep
+
+DELIMITER ;

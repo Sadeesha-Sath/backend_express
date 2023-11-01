@@ -1,17 +1,22 @@
 
 Delimiter $$
 DROP procedure IF EXISTS add_trn$$
--- Query Sep
-Delimiter $$
 CREATE PROCEDURE add_trn(in fromAccNo varchar(20), in toAccNo varchar(20), in amount decimal(15,2), in trnType varchar(20), in description varchar(100))
 BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	GET DIAGNOSTICS CONDITION 1
+	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+	ROLLBACK;
+END;
 	START TRANSACTION;
     -- If it's an online transaction
     SELECT Balance, SavingsPlanType, MinimumBalance INTO @fromBalance, @savingType, @MinimumBalance FROM minimumbalanceview WHERE AccountNo = fromAccNo LIMIT 1 FOR UPDATE;
     IF (trnType = 'Online') THEN
         -- Check if the account has exceeded the monthly withdrawal limit
         IF (@savingType  is not null) THEN
-            SELECT count INTO @count FROM MonthlyTransactionCountView WHERE FromAccNo = fromAccNo LIMIT 1 FOR UPDATE;
+            SELECT MonthlyTransactionCount INTO @count FROM Account WHERE AccountNo = fromAccNo LIMIT 1 FOR UPDATE;
             IF @count is null or @count > 5 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Monthly Transaction Limit Exceeded';
                 rollback;
@@ -23,6 +28,7 @@ BEGIN
             rollback;
         END IF;
         INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, toAccNo, amount, 'Online', description);
+        UPDATE Account SET MonthlyTransactionCount = MonthlyTransactionCount + 1 WHERE AccountNo = fromAccNo;
 
     -- If it's a loan transfer
     ELSEIF (trnType = 'Loan') THEN
@@ -31,7 +37,7 @@ BEGIN
     ELSEIF (trnType = 'ATM') THEN
         -- Check if the account has exceeded the monthly withdrawal limit
         IF @savingType is not null THEN
-            SELECT count INTO @count FROM MonthlyTransactionCountView WHERE FromAccNo = fromAccNo LIMIT 1 FOR UPDATE;
+            SELECT MonthlyTransactionCount INTO @count FROM Account WHERE AccountNo = fromAccNo LIMIT 1 FOR UPDATE;
             IF @count is null or @count > 5 THEN
                 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Monthly Transaction Limit Exceeded';
                 rollback;
@@ -44,20 +50,24 @@ BEGIN
         END IF;
         INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, NULL, amount, trnType, description);
         INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, NULL, amount, 'TrnFee', "Transaction Fee for TransactionID: " + LAST_INSERT_ID());
+        UPDATE Account SET MonthlyTransactionCount = MonthlyTransactionCount + 1 WHERE AccountNo = fromAccNo;
     END IF;
     COMMIT;
 END$$
-
 Delimiter ;
-
--- Query Sep	
+		
 
 Delimiter $$
 DROP PROCEDURE IF EXISTS approve_loan$$
--- Query Sep
-Delimiter $$
 create PROCEDURE approve_loan (in loanApplicationID int, in userID int)
 BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	GET DIAGNOSTICS CONDITION 1
+	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+	ROLLBACK;
+END;
 	START TRANSACTION;
     SELECT customerID, Amount, Duration, Type INTO @customerID, @Amount, @Duration, @Type FROM LoanApplication WHERE LoanApplicationID = loanApplicationID LIMIT 1 FOR UPDATE;
     SELECT InterestRate INTO @InterestRate FROM LoanInterestRate WHERE Duration = @Duration AND Type = @Type LIMIT 1;
@@ -83,14 +93,17 @@ BEGIN
 END$$
 Delimiter ;
 
--- Query Sep
-
 Delimiter $$
 DROP PROCEDURE IF EXISTS reject_loan$$
--- Query Sep
-Delimiter $$
 CREATE PROCEDURE reject_loan (in loanApplicationID int, in userID int)
 BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	GET DIAGNOSTICS CONDITION 1
+	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+	ROLLBACK;
+END;
 	START TRANSACTION;
     SELECT EmployeeID AS EmployeeID INTO @EmployeeID FROM ManagerView WHERE UserID = userID;
     UPDATE LoanApplication SET 
@@ -102,14 +115,17 @@ BEGIN
 END$$
 Delimiter ;
 
--- Query Sep
-
 Delimiter $$
 DROP PROCEDURE IF EXISTS pay_installment$$
--- Query Sep
-Delimiter $$
 CREATE PROCEDURE pay_installment (in loanID int)
 BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	GET DIAGNOSTICS CONDITION 1
+	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+	ROLLBACK;
+END;
 	START TRANSACTION;
     SELECT Balance, Installment INTO @Balance, @Installment FROM Loan WHERE LoanID = loanID LIMIT 1 FOR UPDATE;
     IF @Balance > 0 THEN
@@ -127,16 +143,18 @@ BEGIN
     END IF;
     COMMIT;
 END$$
-Delimiter ;
-
--- Query Sep
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS submit_online_loan$$
--- Query Sep
-Delimiter $$
 CREATE PROCEDURE submit_online_loan ( IN FixedId varchar(20), IN branchID int, IN duration decimal(2), IN type varchar(15), IN amount decimal(15,2), IN userID int)
 BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	GET DIAGNOSTICS CONDITION 1
+	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+	ROLLBACK;
+END;
 	START TRANSACTION;
     SELECT CustomerID INTO @CustomerID from Customer WHERE UserID = userID LIMIT 1;
     -- Check if the amount is greater than 500000 or 60% of the fixed deposit amount
@@ -155,7 +173,6 @@ BEGIN
             amount, 
             'Rejected');
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Amount Exceeds Limit, Loan Rejected';
-        rollback;
     ELSE
         SELECT InterestRate INTO @InterestRate FROM LoanInterestRate WHERE Duration = duration AND Type = type LIMIT 1;
         SET @CurDate = CURDATE();
@@ -192,14 +209,17 @@ BEGIN
     COMMIT;
 END$$
 
--- Query Sep
-
 DELIMITER $$
 DROP PROCEDURE IF EXISTS submit_offline_loan$$
--- Query Sep
-Delimiter $$
 CREATE PROCEDURE submit_offline_loan (in customerID int, in branchID int, in duration decimal(2), in type varchar(15), in amount decimal(15,2), in userID int)
 BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	GET DIAGNOSTICS CONDITION 1
+	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+	ROLLBACK;
+END;
 	START TRANSACTION;
     SELECT EmployeeID INTO @EmployeeID FROM Employee WHERE UserID = userID LIMIT 1;
     -- Add the loan application entry
@@ -219,33 +239,34 @@ BEGIN
 END$$
 DELIMITER ;
 
--- Query Sep
-
-DELIMITER $$
-DROP PROCEDURE IF EXISTS get_own_accounts$$
--- Query Sep
-DELIMITER $$
-CREATE PROCEDURE get_own_accounts (in userID int)
-BEGIN
-    SELECT UserID, a.AccountNo, c.CustomerID, BranchID, Balance, SavingsPlanType 
-		FROM Account a INNER JOIN Customer c 
-        ON c.CustomerID = a.CustomerID 
-        WHERE c.UserID = userID;
-END$$
-DELIMITER ;
-
--- Query Sep
+-- DELIMITER $$
+-- DROP PROCEDURE IF EXISTS get_own_accounts$$
+-- CREATE PROCEDURE get_own_accounts (in userID int)
+-- BEGIN
+--     SELECT UserID, a.AccountNo, c.CustomerID, BranchID, Balance, SavingsPlanType, MonthlyTransactionCount 
+-- 		FROM Account a INNER JOIN Customer c 
+--         ON c.CustomerID = a.CustomerID 
+--         WHERE c.UserID = userID;
+-- END$$
+-- DELIMITER ;
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS add_customer$$
--- Query Sep
-Delimiter $$
 CREATE PROCEDURE add_customer (in Name varchar(100), in Email varchar(100), in Username varchar(50), 
 in Password varchar(1000), in NIC_BR varchar(30), in Address varchar(155), in Phone varchar(15), 
 in CustomerType varchar(30) , in DOB date)
 BEGIN
+DECLARE EXIT HANDLER FOR SQLEXCEPTION
+BEGIN
+	GET DIAGNOSTICS CONDITION 1
+	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
+	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
+	ROLLBACK;
+END;
+	START TRANSACTION;
     INSERT INTO User (UserID, Name, Email, Username, Role, Password) VALUES (NULL, Name, Email, Username, "customer", Password);
     INSERT INTO Customer (CustomerID, NIC_BR, Address, Phone, UserID, CustomerType, DOB) VALUES (NULL, NIC_BR, Address, Phone, last_insert_id(), CustomerType, DOB);
+    COMMIT;
 END$$
 
 Delimiter ;
