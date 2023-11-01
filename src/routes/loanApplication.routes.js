@@ -8,13 +8,25 @@ const {
   rejectLoanApplication,
   addOnlineLoanApplication,
   addOfflineLoanApplication,
+  findAllPending,
 } = require("@models/loanApplications.model.js");
+const permissionCheck = require("@utils/permissionCheck");
+const { getBranchfromUserID } = require("@models/branch.model");
 
 // GET all loan applications
 router.get("/", (req, res) => {
-  if (req.query.branchID) {
-    getBranchfromUserID(req.user.userID).then((result) => {
-      if (result === null) {
+  if (permissionCheck("ALL_LOAN_APPLICATIONS", req.user)) {
+    findAll(req.query.branchID)
+      .then((result) => {
+        res.status(200).send(result);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err);
+      });
+  } else if (req.query.branchID) {
+    getBranchfromUserID(req.user.UserID).then((result) => {
+      if (!result) {
         res.status(403).send({
           message: "You need to be an employee to view the applications",
         });
@@ -22,7 +34,7 @@ router.get("/", (req, res) => {
       }
       if (
         permissionCheck("BRANCH_LOAN_APPLICATIONS", req.user) &&
-        result.branchID === req.query.branchID
+        result.BranchID === req.query.branchID
       ) {
         findAll(req.query.branchID)
           .then((result) => {
@@ -40,8 +52,57 @@ router.get("/", (req, res) => {
       }
     });
   } else {
-    if (permissionCheck("ALL_LOAN_APPLICATIONS", req.user)) {
-      findAll()
+    res.status(403).send({ message: "You don't have necessary permissions" });
+  }
+});
+
+router.get("/pending", (req, res) => {
+  if (permissionCheck("ALL_LOAN_APPLICATIONS", req.user)) {
+    findAllPending(req.query.branchID)
+      .then((result) => {
+        res.status(200).send(result);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err);
+      });
+  } else if (req.query.branchID) {
+    getBranchfromUserID(req.user.UserID).then((result) => {
+      if (!result) {
+        res.status(403).send({
+          message: "You need to be an employee to view the applications",
+        });
+        return;
+      }
+      if (
+        permissionCheck("BRANCH_LOAN_APPLICATIONS", req.user) &&
+        result.BranchID === req.query.branchID
+      ) {
+        findAllPending(req.query.branchID)
+          .then((result) => {
+            res.status(200).send(result);
+          })
+          .catch((err) => {
+            console.error(err);
+            res.status(500).send(err);
+          });
+      } else {
+        res.status(403).send({
+          message:
+            "You don't have necessary permissions to view all applications. Please consider selecting your branch",
+        });
+      }
+    });
+  } else {
+    res.status(403).send({ message: "You don't have necessary permissions" });
+  }
+});
+
+// POST create a new loan application
+router.post("/new", (req, res) => {
+  if (req.body.isOnline === true) {
+    if (permissionCheck("ADD_ONLINE_LOAN_APPLICATION", req.user)) {
+      addOnlineLoanApplication(req.body, req.user.UserID)
         .then((result) => {
           res.status(200).send(result);
         })
@@ -52,6 +113,18 @@ router.get("/", (req, res) => {
     } else {
       res.status(403).send({ message: "You don't have necessary permissions" });
     }
+  }
+  if (permissionCheck("ADD_OFFLINE_LOAN_APPLICATION", req.user)) {
+    addOfflineLoanApplication(req.body, req.user.UserID)
+      .then((result) => {
+        res.status(200).send(result);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err);
+      });
+  } else {
+    res.status(403).send({ message: "You don't have necessary permissions" });
   }
 });
 
@@ -72,7 +145,7 @@ router.get("/:id", (req, res) => {
         res.status(404).send({ message: "No such loan application" });
         return;
       }
-      getBranchfromUserID(req.user.userID).then((userRes) => {
+      getBranchfromUserID(req.user.UserID).then((userRes) => {
         if (
           permissionCheck("BRANCH_LOAN_APPLICATION", req.user) &&
           result.branchID == userRes.branchID
@@ -103,9 +176,9 @@ router.post("/:id/approve", (req, res) => {
         res.status(404).send({ message: "No such loan application" });
         return;
       }
-      getBranchfromUserID(req.user.userID).then((userRes) => {
+      getBranchfromUserID(req.user.UserID).then((userRes) => {
         if (result.branchID != userRes.branchID) {
-          approveLoanApplication(req.params.id, req.user.userID)
+          approveLoanApplication(req.params.id, req.user.UserID)
             .then((result) => {
               res.status(200).send(result);
             })
@@ -113,6 +186,10 @@ router.post("/:id/approve", (req, res) => {
               console.error(err);
               res.status(500).send(err);
             });
+        } else {
+          res.status(403).send({
+            message: "You can approve only the applications of your branch",
+          });
         }
       });
     });
@@ -127,9 +204,9 @@ router.post("/:id/reject", (req, res) => {
         res.status(404).send({ message: "No such loan application" });
         return;
       }
-      getBranchfromUserID(req.user.userID).then((userRes) => {
+      getBranchfromUserID(req.user.UserID).then((userRes) => {
         if (result.branchID != userRes.branchID) {
-          rejectLoanApplication(req.params.id, req.user.userID)
+          rejectLoanApplication(req.params.id, req.user.UserID)
             .then((result) => {
               res.status(200).send(result);
             })
@@ -137,39 +214,13 @@ router.post("/:id/reject", (req, res) => {
               console.error(err);
               res.status(500).send(err);
             });
+        } else {
+          res.status(403).send({
+            message: "You can reject only the applications of your branch",
+          });
         }
       });
     });
-  }
-});
-
-// POST create a new loan application
-router.post("/new", (req, res) => {
-  if (req.body.isOnline === true) {
-    if (permissionCheck("ADD_ONLINE_LOAN_APPLICATION", req.user)) {
-      addOnlineLoanApplication(req.body, req.user.userID)
-        .then((result) => {
-          res.status(200).send(result);
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).send(err);
-        });
-    } else {
-      res.status(403).send({ message: "You don't have necessary permissions" });
-    }
-  }
-  if (permissionCheck("ADD_OFFLINE_LOAN_APPLICATION", req.user)) {
-    addOfflineLoanApplication(req.body, req.user.userID)
-      .then((result) => {
-        res.status(200).send(result);
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send(err);
-      });
-  } else {
-    res.status(403).send({ message: "You don't have necessary permissions" });
   }
 });
 

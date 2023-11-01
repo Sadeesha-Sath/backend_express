@@ -4,6 +4,7 @@ const { comparePasswords } = require("@utils/password_helper");
 const { addCustomer } = require("@models/customer.model");
 const generateToken = require("../utils/tokenGenerator");
 const tokenVerification = require("../utils/tokenVerification");
+const { generateHash } = require("../utils/password_helper");
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
@@ -14,7 +15,7 @@ router.post("/login", async (req, res) => {
         (Array.isArray(user) && user.length) ||
         (!Array.isArray(user) && user)
       ) {
-        if (comparePasswords(req.body.password, user.Password)) {
+        if (await comparePasswords(req.body.password, user.Password)) {
           const { Password, ...userRest } = user;
           const token = generateToken(userRest);
           res.status(200).send({

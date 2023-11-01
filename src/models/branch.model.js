@@ -1,14 +1,20 @@
 const { query, escapedQuery } = require("@services/db.service.js");
 
 const findAll = async () => {
-  const result = await query("SELECT * from Branch");
+  const result = await query("SELECT * from BranchView");
+  console.log(result);
+  return result[0];
+};
+
+const findAllMinimal = async () => {
+  const result = await query("SELECT BranchID, BranchName from Branch");
   console.log(result);
   return result[0];
 };
 
 const findOne = async (id) => {
   const result = await escapedQuery({
-    sql: `SELECT * from Branch where BranchID=?`,
+    sql: `SELECT * from BranchView where BranchID=?`,
     values: [id],
   });
   console.log(result[0]);
@@ -17,8 +23,17 @@ const findOne = async (id) => {
 
 const findManager = async (id) => {
   const result = await escapedQuery({
-    sql: `SELECT * from Employee where e.BranchID=${id} and e.IsManager=1`,
+    sql: `SELECT * from Employee where e.BranchID=? and e.IsManager=1`,
     values: [id],
+  });
+  console.log(result[0]);
+  return result[0][0];
+};
+
+const getBranchfromUserID = async (userID) => {
+  const result = await escapedQuery({
+    sql: "SELECT * from Employee WHERE UserID=? LIMIT 1",
+    values: [userID],
   });
   console.log(result[0]);
   return result[0][0];
@@ -33,4 +48,10 @@ const findManager = async (id) => {
 //   return result;
 // };
 
-module.exports = { findAll, findOne, findManager };
+module.exports = {
+  findAll,
+  findOne,
+  findManager,
+  findAllMinimal,
+  getBranchfromUserID,
+};

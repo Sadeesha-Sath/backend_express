@@ -48,13 +48,4 @@ const addCustomer = async (data) => {
   return result;
 };
 
-const findUserIDfromCustomerID = async (customerID) => {
-  const result = await escapedQuery({
-    sql: `SELECT UserID from CustomerView where CustomerID=?`,
-    values: [customerID],
-  });
-  console.log(result[0]);
-  return result[0];
-};
-
-module.exports = { findOne, findAll, addCustomer, findUserIDfromCustomerID };
+module.exports = { findOne, findAll, addCustomer };
