@@ -4,6 +4,8 @@ const {
   findUserIDfromCustomerID,
   findUserIDfromTransactionID,
   findUserIDfromAccountID,
+  findUserIDfromFD,
+  findUserIDfromLoan,
 } = require("@models/user.model.js");
 
 const isOwnUser = async (id, userID) => {
@@ -37,6 +39,11 @@ const getBranchfromEmployeeID = async (employeeID) => {
 const isOwnFD = async (fixedID, userID) => {
   const userIDfromFD = await findUserIDfromFD(fixedID);
   return userIDfromFD === userID;
+};
+
+const isOwnLoan = async (loanID, userID) => {
+  const userIDfromLoan = await findUserIDfromLoanID(loanID);
+  return userIDfromLoan === userID;
 };
 
 module.exports = {

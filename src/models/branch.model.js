@@ -30,6 +30,15 @@ const findManager = async (id) => {
   return result[0][0];
 };
 
+const getBranchfromUserID = async (userID) => {
+  const result = await escapedQuery({
+    sql: "SELECT * from Employee WHERE UserID=? LIMIT 1",
+    values: [userID],
+  });
+  console.log(result[0]);
+  return result[0][0];
+};
+
 // const addBranch = async (data) => {
 //   const result = await escapedQuery({
 //     sql: "INSERT INTO Branch (branchID, name, address, phone) VALUES (NULL, ?, ?, ?);",
@@ -39,4 +48,10 @@ const findManager = async (id) => {
 //   return result;
 // };
 
-module.exports = { findAll, findOne, findManager, findAllMinimal };
+module.exports = {
+  findAll,
+  findOne,
+  findManager,
+  findAllMinimal,
+  getBranchfromUserID,
+};
