@@ -39,20 +39,10 @@ const findOwn = async (userID) => {
   return result[0];
 };
 
-const findInterests = async() =>{
-  const result = {}
-  const business = await query('SELECT * from loaninterestrate where Type = "Business"');
-  const personal = await query('SELECT * from loaninterestrate where Type = "Personal"');
-  result['business'] = business[0];
-  result['personal'] = personal[0];
-  return result;
-}
-
 module.exports = {
   findAll,
   findOne,
   findOwn,
   findActiveLoans,
   findOwnActiveLoans,
-  findInterests
 };

@@ -35,7 +35,7 @@ router.get("/basic", async (req, res) => {
 });
 
 router.get("/my", async (req, res) => {
-  if (req.user.Role == "customer") {
+  if (req.user.Role === "customer") {
     console.log("here at my");
     const result = await findFromUser(req.user.UserID, req.query);
     res.status(200).send(result);

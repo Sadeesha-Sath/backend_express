@@ -44,12 +44,13 @@ router.post("/checkUsername", async (req, res) => {
   if (req.body.username) {
     try {
       const user = await findByUsername(req.body.username);
+      const isAvailable = Boolean(
+        (Array.isArray(user) && user.length !== 0) ||
+          (!Array.isArray(user) && !user)
+      );
       res.status(200).send({
-        available: Boolean(
-          (Array.isArray(user) && user.length !== 0) ||
-            (!Array.isArray(user) && !user)
-        ),
-        message: "Username not available",
+        available: isAvailable,
+        message: isAvailable ? "Username Available" : "Username not available",
       });
       return;
     } catch (err) {
@@ -64,12 +65,15 @@ router.post("/checkNic", async (req, res) => {
     try {
       const user = await findCustomerByNIC(req.body.nic);
       //console.log(user);
-      res.status(200).send({
-        available: Boolean(
+      const customerExists = Boolean(
+        !(
           (Array.isArray(user) && user.length !== 0) ||
-            (!Array.isArray(user) && !user)
-        ),
-        message: "Customer does not exist",
+          (!Array.isArray(user) && !user)
+        )
+      );
+      res.status(200).send({
+        exists: customerExists,
+        message: customerExists ? "Customer Exists" : "Customer does not exist",
       });
       console.log(res.message);
       return;
