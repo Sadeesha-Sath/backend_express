@@ -169,16 +169,16 @@ router.get("/:id", (req, res) => {
 });
 
 // POST approve a loan application
-router.post("/:id/approve", (req, res) => {
+router.post("/approve", (req, res) => {
   if (permissionCheck("APPROVE_LOAN_APPLICATION", req.user)) {
-    getBranchIDfromLoanApplication(req.params.id).then((result) => {
+    getBranchIDfromLoanApplication(req.body?.id).then((result) => {
       if (!result) {
         res.status(404).send({ message: "No such loan application" });
         return;
       }
       getBranchfromUserID(req.user.UserID).then((userRes) => {
         if (result.branchID != userRes.branchID) {
-          approveLoanApplication(req.params.id, req.user.UserID)
+          approveLoanApplication(req.body?.id, req.user.UserID)
             .then((result) => {
               res.status(200).send(result);
             })
@@ -193,20 +193,22 @@ router.post("/:id/approve", (req, res) => {
         }
       });
     });
+  } else {
+    res.status(403).send({ message: "You are not authorized to do this" });
   }
 });
 
 // POST reject a loan application
-router.post("/:id/reject", (req, res) => {
+router.post("/reject", (req, res) => {
   if (permissionCheck("REJECT_LOAN_APPLICATION", req.user)) {
-    getBranchIDfromLoanApplication(req.params.id).then((result) => {
+    getBranchIDfromLoanApplication(req.body?.id).then((result) => {
       if (!result) {
         res.status(404).send({ message: "No such loan application" });
         return;
       }
       getBranchfromUserID(req.user.UserID).then((userRes) => {
         if (result.branchID != userRes.branchID) {
-          rejectLoanApplication(req.params.id, req.user.UserID)
+          rejectLoanApplication(req.body?.id, req.user.UserID)
             .then((result) => {
               res.status(200).send(result);
             })
@@ -221,6 +223,8 @@ router.post("/:id/reject", (req, res) => {
         }
       });
     });
+  } else {
+    res.status(403).send({ message: "You are not authorized to do this" });
   }
 });
 
