@@ -34,6 +34,7 @@ SELECT AccountNo, CustomerID, ParentID,
 BranchID, Balance, SavingsPlanType, InterestRate, MinimumBalance 
 FROM SavingsAccountView WHERE SavingsPlanType = 'Children';
 
+
 -- DROP VIEW IF EXISTS MonthlyTransactionCountView;
 -- CREATE VIEW MonthlyTransactionCountView AS
 -- SELECT a.AccountNo as AccountNo, 
