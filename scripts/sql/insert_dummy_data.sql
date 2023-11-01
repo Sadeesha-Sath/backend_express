@@ -12,14 +12,14 @@ INSERT INTO User (UserID, Name, Role, Username, Email, Password) VALUES
 (NULL, 'Customer User 2', 'customer', 'customer_user_2', 'customer2@example.com', '$2b$10$yPjeOyUKqHYzfWlC4LcJS.2AUHOQHBQbLkUzlUX7vJQgJqhObz2KC');
 
 -- Insert data into Employee table
-INSERT INTO Employee (EmployeeID, BranchID, UserID, Position, IsManager) VALUES 
-(NULL, 1, 2, 'Branch_Manager', TRUE),
-(NULL, 2, 3, 'Other', FALSE);
+INSERT INTO Employee (EmployeeID, BranchID, UserID, IsManager) VALUES 
+(NULL, 1, 2, TRUE),
+(NULL, 2, 3, FALSE);
 
 -- Insert data into Customer table
 INSERT INTO Customer (CustomerID, NIC_BR, DOB, Address, Phone, UserID, CustomerType) VALUES 
 (NULL, '1234567890', '1990-01-15', '789 Oak St, Cityville, XYZ', '111-222-3333', 4, 'Individual'),
-(NULL, '0987654321', '1985-05-20', '101 Pine St, Cityville, XYZ', '444-555-6666', 5, 'Organization');
+(NULL, '0987654321', NULL, '101 Pine St, Cityville, XYZ', '444-555-6666', 5, 'Organization');
 
 -- Insert data into SavingsPlan table
 INSERT INTO SavingsPlan (SavingsPlanType, InterestRate, MinimumBalance) VALUES 
@@ -41,10 +41,17 @@ INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, TrnType, Amount) VAL
 (NULL, 'A000001', 'A000002', 'Online', 200),
 (NULL, 'A000002', null, 'ATM', 50);
 
+-- Insert data into FixedDepositInterestRate table
+INSERT INTO FixedDepositInterestRate (Duration, InterestRate) VALUES 
+(6, 0.13),
+(12, 0.14),
+(36, 0.15);
+
+
 -- Insert data into FixedDeposit table
-INSERT INTO FixedDeposit (FixedId, SavingsAccNo, StartingAmount, Duration, StartDate, LastDeptDate, InterestRate) VALUES 
-('F000001', 'A000001', 1000, 6, '2023-01-01', '2023-07-01', 5.00),
-('F000002', 'A000001', 2000, 12, '2023-01-01', '2024-01-01', 5.50);
+INSERT INTO FixedDeposit (FixedId, SavingsAccNo, StartingAmount, Duration, StartDate, LastDeptDate) VALUES 
+('F000001', 'A000001', 1000, 6, '2023-01-01', '2023-07-01'),
+('F000002', 'A000001', 2000, 12, '2023-01-01', '2024-01-01');
 
 -- Insert data into LoanApplication table
 INSERT INTO LoanApplication (LoanApplicationID, IsOnline, FixedId, CustomerID, BranchID, Duration, Type, CreatedBy, Amount, Status, CheckedBy) VALUES 
@@ -68,9 +75,3 @@ INSERT INTO LoanInterestRate (Duration, Type, InterestRate) VALUES
 INSERT INTO LoanInstallment (LoanID, PaymentDate, DueDate, Status) VALUES 
 (1, '2023-02-01', '2023-02-01', 'Paid'),
 (2, '2023-02-01', '2023-02-01', 'Pending');
-
--- Insert data into FixedDepositInterestRate table
-INSERT INTO FixedDepositInterestRate (Duration, InterestRate) VALUES 
-(6, 0.13),
-(12, 0.14),
-(36, 0.15);

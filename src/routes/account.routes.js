@@ -26,7 +26,7 @@ router.get("/", async (req, res) => {
 
 router.get("/basic", async (req, res) => {
   try {
-    const result = await findAllMinimal(req.query);
+    const result = await findAllMinimal();
     res.status(200).send(result);
   } catch (err) {
     console.error(err);

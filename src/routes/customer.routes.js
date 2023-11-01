@@ -1,6 +1,7 @@
 const express = require("express");
 const permissionCheck = require("@utils/permissionCheck");
 const { findAll, findOne, addCustomer } = require("@models/customer.model");
+const { findByUsername } = require("@models/user.model");
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -69,7 +70,7 @@ router.post("/new", async (req, res) => {
           });
         }
       } catch (err) {
-        res.status(500).send({ message: err });
+        res.status(500).send({ message: err.message });
       }
     } else {
       res.status(400).send({ message: "Username and Password are required" });
