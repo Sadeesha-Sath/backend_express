@@ -128,6 +128,15 @@ const findUserIDfromFD = async (FixedID) => {
   return result[0][0];
 };
 
+const findUserIDfromLoan = async (loanID) => {
+  const result = await escapedQuery({
+    sql: "SELECT c.UserID from Loan l JOIN Customer c ON c.CustomerID=l.CustomerID WHERE l.LoanID=?",
+    values: [loanId],
+  });
+  console.log(result[0][0]);
+  return result[0][0];
+};
+
 module.exports = {
   findAll,
   findOne,
@@ -143,4 +152,5 @@ module.exports = {
   findUserIDfromTransactionID,
   findUserIDfromAccountID,
   findUserIDfromFD,
+  findUserIDfromLoan,
 };

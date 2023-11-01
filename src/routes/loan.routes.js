@@ -45,7 +45,10 @@ router.get("/interests", async (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-  if (permissionCheck("ALL_LOANS", req.user) || isOwnFD(id, req.user.UserID)) {
+  if (
+    permissionCheck("ALL_LOANS", req.user) ||
+    isOwnLoan(req.params.id, req.user.UserID)
+  ) {
     findOne(req.params.id)
       .then((result) => {
         if (!result) {

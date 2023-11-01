@@ -13,6 +13,9 @@ const permissions = {
     "ALL_FD",
     "ALL_LOANS",
     "ALL_BRANCHES",
+    "ALL_LOAN_APPLICATIONS",
+    "BRANCH_LOAN_APPLICATIONS",
+    "ALL_INSTALLMENTS",
     "ALL_INTERESTS"
   ],
   employee: [
@@ -24,6 +27,8 @@ const permissions = {
     "ALL_FD",
     "ALL_LOANS",
     "ALL_BRANCHES",
+    "BRANCH_LOAN_APPLICATIONS",
+    "ALL_INSTALLMENTS",
     "ALL_INTERESTS"
   ],
   branch_manager: [
@@ -38,9 +43,12 @@ const permissions = {
     "ALL_FD",
     "ALL_LOANS",
     "ALL_BRANCHES",
+    "BRANCH_LOAN_APPLICATIONS",
+    "APPROVE_LOAN_APPLICATIONS",
+    "ALL_INSTALLMENTS",
     "ALL_INTERESTS"
   ],
-  customer: ["MY_TRANSACTIONS", "MY_LOANS","ALL_INTERESTS"],
+  customer: ["MY_TRANSACTIONS", "MY_LOANS", "MY_INSTALLMENTS","ALL_INTERESTS"],
 };
 
 const permissionCheck = (access, user) => {

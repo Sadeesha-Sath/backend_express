@@ -27,7 +27,10 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-  if (permissionCheck("ALL_USERS", req.user) || isOwnUser(id, req.user.UserID)) {
+  if (
+    permissionCheck("ALL_USERS", req.user) ||
+    isOwnUser(req.params.id, req.user.UserID)
+  ) {
     findOne(req.params.id)
       .then((result) => {
         if (!result) {
@@ -46,7 +49,10 @@ router.get("/:id", (req, res) => {
 });
 
 router.put("/:id", (req, res) => {
-  if (permissionCheck("UPDATE_USERS", req.user) || isOwnUser(id, req.user.UserID)) {
+  if (
+    permissionCheck("UPDATE_USERS", req.user) ||
+    isOwnUser(req.params.id, req.user.UserID)
+  ) {
     updateOne(id, req.body)
       .then((result) => {
         res.status(200).send(result);
@@ -63,7 +69,7 @@ router.put("/:id", (req, res) => {
 router.put("/:id/change_password", async (req, res) => {
   if (
     permissionCheck("UPDATE_USERS_PASSWORD", req.user) ||
-    isOwnUser(id, req.user.UserID)
+    isOwnUser(req.params.id, req.user.UserID)
   ) {
     const curr_pass = req.body.current_password;
     const new_pass = req.body.new_password;

@@ -18,8 +18,10 @@
     "nodemon": "^3.0.1"
   },
   "scripts": {
-    "start": "SET NODE_ENV=DEFAULT & nodemon index.js",
-    "dev": "SET NODE_ENV=DEV & nodemon index.js",
+    "start_win": "SET NODE_ENV=DEFAULT & nodemon index.js",
+    "dev_win": "SET NODE_ENV=DEV & nodemon index.js",
+    "start": "NODE_ENV=DEFAULT nodemon index.js",
+    "dev": "NODE_ENV=DEV nodemon index.js",
     "init-db": "node ./scripts/initDb.js",
     "create-admin": "node ./scripts/createAdmin.js",
     "delete-all-admin": "node ./scripts/deleteAllAdmin.js"

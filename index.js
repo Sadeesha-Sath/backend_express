@@ -27,6 +27,13 @@ app.use(
   verifyToken,
   require("@routes/fixed-deposit.routes")
 );
+app.use(
+  "/loanApplications",
+  verifyToken,
+  require("@routes/loanApplication.routes")
+);
+app.use("/installments", verifyToken, require("@routes/installment.routes"));
+app.use("/interest", verifyToken, require("@routes/interest.routes"));
 
 
 

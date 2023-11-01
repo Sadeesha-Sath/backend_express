@@ -6,14 +6,16 @@ const findAll = async (queryParams) => {
   const baseQuery = "SELECT * from AccountView";
   const finalQuery = modifySQL(baseQuery, queryParams);
   console.log("Final Query: " + finalQuery);
-  try {
-    const result = await query(finalQuery);
-    console.log(result);
-    return result[0];
-  } catch (err) {
-    console.error(err);
-    return null;
-  }
+
+  const result = await query(finalQuery);
+  console.log(result);
+  return result[0];
+};
+
+const findAllMinimal = async () => {
+  const result = await query("SELECT AccountNo from Account");
+  console.log(result);
+  return result[0];
 };
 
 const findOne = async (id) => {
@@ -34,6 +36,4 @@ const findFromUser = async (userID) => {
   return result[0];
 };
 
-
-
-module.exports = { findAll, findOne, findFromUser };
+module.exports = { findAll, findOne, findFromUser, findAllMinimal };

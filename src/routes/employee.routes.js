@@ -21,7 +21,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   if (
     permissionCheck("ALL_EMPLOYEES", req.user) ||
-    isOwnEmployee(id, req.user.UserID)
+    isOwnEmployee(req.params.id, req.user.UserID)
   ) {
     findOne(req.params.id)
       .then((result) => {
