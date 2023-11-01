@@ -9,11 +9,6 @@ app.use(express.urlencoded({ extended: true }));
 
 require("dotenv").config();
 
-
-
-
-
-
 // Routes
 
 const verifyToken = require("@middlewares/verifyToken");
@@ -38,18 +33,12 @@ app.use(
 app.use("/installments", verifyToken, require("@routes/installment.routes"));
 app.use("/interest", verifyToken, require("@routes/interest.routes"));
 
-
 //verifying token must be fixed
-app.use("/report", require("./src/routes/reports.routes"))
-app.use("/fundtransfer", require("./src/routes/fundtransfer.routes"))   
-app.use("/interest", require("./src/routes/fixinterest.routes"))
-
+app.use("/report", verifyToken, require("./src/routes/reports.routes"));
 
 app.get("/", (req, res) => {
   res.send("Hello World");
 });
-
-
 
 // 404 Not found
 app.use("*", (req, res) => {
@@ -60,7 +49,6 @@ app.use("*", (req, res) => {
 
 // Start server
 const port = process.env.PORT || 8080;
-
 
 app.listen(port, () => {
   console.log(`App is listnening on port ${port}`);
