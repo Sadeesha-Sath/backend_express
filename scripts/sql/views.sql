@@ -73,3 +73,4 @@ SELECT a.AccountNo as AccountNo, a.Balance as Balance, a.CustomerID as CustomerI
     from Account a INNER JOIN Customer c on c.CustomerID = a.CustomerID
     INNER JOIN Branch b on b.BranchID = a.BranchID LEFT JOIN Customer p on p.CustomerID = a.ParentID
     INNER JOIN User u1 ON u1.UserID = c.UserID LEFT JOIN User u2 ON u2.UserID = p.UserID;
+

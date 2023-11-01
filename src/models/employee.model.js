@@ -15,15 +15,6 @@ const findAll = async () => {
   return result[0];
 };
 
-const findUserIDfromEmployeeID = async (employeeID) => {
-  const result = await escapedQuery({
-    sql: `SELECT UserID from Employee where EmployeeID=?`,
-    values: [employeeID],
-  });
-  console.log(result[0]);
-  return result[0][0];
-};
-
 const findBranchIDfromEmployeeID = async (employeeID) => {
   const result = await escapedQuery({
     sql: `SELECT BranchID from Employee where EmployeeID=?`,
@@ -33,9 +24,18 @@ const findBranchIDfromEmployeeID = async (employeeID) => {
   return result[0][0];
 };
 
+const findEmployeeIDfromUserID = async (userID) => {
+  const result = await escapedQuery({
+    sql: `SELECT EmployeeID from Employee where UserID=?`,
+    values: [userID],
+  });
+  console.log(result[0][0]);
+  return result[0][0];
+};
+
 module.exports = {
   findOne,
   findAll,
-  findUserIDfromEmployeeID,
   findBranchIDfromEmployeeID,
+  findEmployeeIDfromUserID,
 };

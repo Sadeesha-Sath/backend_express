@@ -1,9 +1,10 @@
 const express = require("express");
 const permissionCheck = require("@utils/permissionCheck");
 const router = express.Router();
+const { findAll, findOne } = require("@models/employee.model");
 
 router.get("/", (req, res) => {
-  if (permissionCheck("ALL_EMPLOYEES", req.user.id)) {
+  if (permissionCheck("ALL_EMPLOYEES", req.user)) {
     findAll()
       .then((result) => {
         res.status(200).send(result);
@@ -20,7 +21,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   if (
     permissionCheck("ALL_EMPLOYEES", req.user) ||
-    isOwnEmployee(id, req.user.id)
+    isOwnEmployee(req.params.id, req.user.UserID)
   ) {
     findOne(req.params.id)
       .then((result) => {
