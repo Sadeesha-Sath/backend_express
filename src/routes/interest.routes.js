@@ -3,7 +3,7 @@ const {
   findAllSavingInterestRates,
   findAllLoanInterestRates,
   findAllFDInterestRates,
-} = require("../models/interest.model");
+} = require("@models/interest.model");
 
 const router = express.Router();
 

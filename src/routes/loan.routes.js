@@ -34,6 +34,7 @@ router.get("/active", async (req, res) => {
   }
 });
 
+
 router.get("/:id", (req, res) => {
   if (
     permissionCheck("ALL_LOANS", req.user) ||
