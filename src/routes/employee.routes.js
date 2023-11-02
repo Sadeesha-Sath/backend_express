@@ -47,8 +47,8 @@ router.post("/new", (req, res) => {
         res.status(200).send(result);
       })
       .catch((err) => {
-        console.error(err);
-        res.status(500).send({ message: err });
+        console.error(err.message);
+        res.status(500).send({ message: err.message });
       });
   } else {
     res.status(403).send({ message: "You don't have necessary permissions" });

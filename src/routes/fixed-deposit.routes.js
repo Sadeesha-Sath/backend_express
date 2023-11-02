@@ -6,12 +6,16 @@ const {
   findFromUser,
 } = require("@models/fixed-deposit.model");
 const { isOwnFD } = require("@models/isOwnData");
+const { addOne } = require("../models/fixed-deposit.model");
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   if (permissionCheck("ALL_FD", req.user)) {
     const result = await findAll(req.query);
+    res.status(200).send(result);
+  } else if ((permissionCheck("MY_FD"), req.user)) {
+    const result = await findFromUser(req.user.UserID, req.query);
     res.status(200).send(result);
   } else {
     res.status(403).send({ message: "You don't have necessary permissions" });
@@ -24,6 +28,20 @@ router.get("/my", async (req, res) => {
     res.status(200).send(result);
   } else {
     res.status(403).send({ message: "Only Customers can get there accounts" });
+  }
+});
+
+router.post("/new", async (req, res) => {
+  if (permissionCheck("ADD_FD", req.user)) {
+    try {
+      const result = await addOne(req.body);
+      res.status(200).send(result);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send({ message: err });
+    }
+  } else {
+    res.status(403).send({ message: "You don't have permission to do this" });
   }
 });
 

@@ -7,6 +7,7 @@ const {
   findAllMinimal,
 } = require("@models/account.model");
 const { isOwnAccount } = require("@models/isOwnData");
+const { findAllSavingMinimal } = require("../models/account.model");
 
 const router = express.Router();
 
@@ -26,7 +27,17 @@ router.get("/", async (req, res) => {
 
 router.get("/basic", async (req, res) => {
   try {
-    const result = await findAllMinimal(req.query);
+    const result = await findAllMinimal();
+    res.status(200).send(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err);
+  }
+});
+
+router.get("/saving/basic", async (req, res) => {
+  try {
+    const result = await findAllSavingMinimal();
     res.status(200).send(result);
   } catch (err) {
     console.error(err);

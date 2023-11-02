@@ -18,6 +18,12 @@ const findAllMinimal = async () => {
   return result[0];
 };
 
+const findAllSavingMinimal = async () => {
+  const result = await query("SELECT AccountNo from savingsaccountview");
+  console.log(result);
+  return result[0];
+};
+
 const findOne = async (id) => {
   const result = await escapedQuery({
     sql: `SELECT * from AccountView where AccountID=?`,
@@ -36,4 +42,10 @@ const findFromUser = async (userID) => {
   return result[0];
 };
 
-module.exports = { findAll, findOne, findFromUser, findAllMinimal };
+module.exports = {
+  findAll,
+  findOne,
+  findFromUser,
+  findAllMinimal,
+  findAllSavingMinimal,
+};
