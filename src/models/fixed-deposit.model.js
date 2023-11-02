@@ -15,6 +15,15 @@ const findOne = async (id) => {
   return result[0][0];
 };
 
+const addOne = async (data) => {
+  const result = await escapedQuery({
+    sql: "CALL add_fd(?,?,?)",
+    values: [data.savingsaccount, data.amount, data.period],
+  });
+  console.log(result);
+  return result[0];
+};
+
 const findFromUser = async (userID) => {
   const result = await escapedQuery({
     sql: `SELECT f.* FROM FixedDepositView f LEFT JOIN Account a on f.SavingsAccNo=a.AccountNo JOIN Customer c on a.CustomerID=c.CustomerID WHERE c.UserID=?`,
@@ -24,4 +33,4 @@ const findFromUser = async (userID) => {
   return result[0];
 };
 
-module.exports = { findAll, findOne, findFromUser };
+module.exports = { findAll, findOne, findFromUser, addOne };

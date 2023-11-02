@@ -54,4 +54,5 @@ module.exports = {
   isOwnAccount,
   getBranchfromEmployeeID,
   isOwnFD,
+  isOwnLoan,
 };

@@ -3,13 +3,6 @@ Delimiter $$
 DROP procedure IF EXISTS add_trn$$
 CREATE PROCEDURE add_trn(in fromAccNo varchar(20), in toAccNo varchar(20), in amount decimal(15,2), in trnType varchar(20), in description varchar(100))
 BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	GET DIAGNOSTICS CONDITION 1
-	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
-	ROLLBACK;
-END;
 	START TRANSACTION;
     -- If it's an online transaction
     SELECT Balance, SavingsPlanType, MinimumBalance INTO @fromBalance, @savingType, @MinimumBalance FROM minimumbalanceview WHERE AccountNo = fromAccNo LIMIT 1 FOR UPDATE;
@@ -49,7 +42,7 @@ END;
             Rollback;
         END IF;
         INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, NULL, amount, trnType, description);
-        INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, NULL, amount, 'TrnFee', "Transaction Fee for TransactionID: " + LAST_INSERT_ID());
+        INSERT INTO Transaction (TransactionID, FromAccNo, ToAccNo, Amount, TrnType,  Description) VALUES (NULL, fromAccNo, NULL, @TrnFee, 'TrnFee', CONCAT("Transaction Fee For Transaction ID: ", last_insert_id()));
         UPDATE Account SET MonthlyTransactionCount = MonthlyTransactionCount + 1 WHERE AccountNo = fromAccNo;
     END IF;
     COMMIT;
@@ -61,13 +54,6 @@ Delimiter $$
 DROP PROCEDURE IF EXISTS approve_loan$$
 create PROCEDURE approve_loan (in loanApplicationID int, in userID int)
 BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	GET DIAGNOSTICS CONDITION 1
-	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
-	ROLLBACK;
-END;
 	START TRANSACTION;
     SELECT customerID, Amount, Duration, Type INTO @customerID, @Amount, @Duration, @Type FROM LoanApplication WHERE LoanApplicationID = loanApplicationID LIMIT 1 FOR UPDATE;
     SELECT InterestRate INTO @InterestRate FROM LoanInterestRate WHERE Duration = @Duration AND Type = @Type LIMIT 1;
@@ -98,12 +84,6 @@ DROP PROCEDURE IF EXISTS reject_loan$$
 CREATE PROCEDURE reject_loan (in loanApplicationID int, in userID int)
 BEGIN
 DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	GET DIAGNOSTICS CONDITION 1
-	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
-	ROLLBACK;
-END;
 	START TRANSACTION;
     SELECT EmployeeID AS EmployeeID INTO @EmployeeID FROM ManagerView WHERE UserID = userID;
     UPDATE LoanApplication SET 
@@ -119,13 +99,6 @@ Delimiter $$
 DROP PROCEDURE IF EXISTS pay_installment$$
 CREATE PROCEDURE pay_installment (in loanID int)
 BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	GET DIAGNOSTICS CONDITION 1
-	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
-	ROLLBACK;
-END;
 	START TRANSACTION;
     SELECT Balance, Installment INTO @Balance, @Installment FROM Loan WHERE LoanID = loanID LIMIT 1 FOR UPDATE;
     IF @Balance > 0 THEN
@@ -146,17 +119,11 @@ END$$
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS submit_online_loan$$
-CREATE PROCEDURE submit_online_loan ( IN FixedId varchar(20), IN branchID int, IN duration decimal(2), IN type varchar(15), IN amount decimal(15,2), IN userID int)
+CREATE PROCEDURE submit_online_loan ( IN FixedId varchar(20), IN duration decimal(2), IN type varchar(15), IN amount decimal(15,2), IN userID int)
 BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	GET DIAGNOSTICS CONDITION 1
-	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
-	ROLLBACK;
-END;
 	START TRANSACTION;
     SELECT CustomerID INTO @CustomerID from Customer WHERE UserID = userID LIMIT 1;
+    SELECT a.BranchID into @BranchID from FixedDeposit f Join Account a on f.SavingsAccNo=a.AccountNo WHERE f.FixedId = FixedId LIMIT 1 FOR UPDATE;
     -- Check if the amount is greater than 500000 or 60% of the fixed deposit amount
     SELECT StartingAmount INTO @StartingAmount FROM FixedDeposit WHERE FixedId = FixedId LIMIT 1 FOR UPDATE;
     IF amount > 500000 OR amount > (@StartingAmount * 0.6) THEN
@@ -167,7 +134,7 @@ END;
             1, 
             FixedId,
             @CustomerID, 
-            branchID, 
+            @BranchID, 
             duration, 
             type, 
             amount, 
@@ -183,7 +150,7 @@ END;
                 1, 
                 FixedId,
                 @CustomerID, 
-                branchID, 
+                @BranchID, 
                 duration, 
                 type, 
                 amount, 
@@ -211,24 +178,17 @@ END$$
 
 DELIMITER $$
 DROP PROCEDURE IF EXISTS submit_offline_loan$$
-CREATE PROCEDURE submit_offline_loan (in customerID int, in branchID int, in duration decimal(2), in type varchar(15), in amount decimal(15,2), in userID int)
+CREATE PROCEDURE submit_offline_loan (in customerID int, in duration decimal(2), in type varchar(15), in amount decimal(15,2), in userID int)
 BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
-BEGIN
-	GET DIAGNOSTICS CONDITION 1
-	@p1 = RETURNED_SQLSTATE, @p2 = MESSAGE_TEXT;
-	SELECT @p1 as RETURNED_SQLSTATE  , @p2 as MESSAGE_TEXT;
-	ROLLBACK;
-END;
 	START TRANSACTION;
-    SELECT EmployeeID INTO @EmployeeID FROM Employee WHERE UserID = userID LIMIT 1;
+    SELECT EmployeeID, BranchID INTO @EmployeeID, @BranchID FROM Employee WHERE UserID = userID LIMIT 1;
     -- Add the loan application entry
     INSERT INTO LoanApplication (LoanApplicationID, IsOnline, CustomerID, BranchID, Duration, Type, Amount, Status, CreatedBy) 
         VALUES (
             NULL, 
             0, 
             customerID, 
-            branchID, 
+            @BranchID, 
             duration, 
             type,
             amount,
@@ -274,3 +234,46 @@ BEGIN
 END$$
 
 Delimiter ;
+
+DELIMITER $$
+DROP PROCEDURE IF EXISTS add_fd$$
+CREATE PROCEDURE add_fd (in SavingsAccNo varchar(20), SAmount decimal(15,2), in Duration decimal(2))
+BEGIN
+	START TRANSACTION;
+    SELECT CONVERT(SUBSTRING(FixedID, 2), UNSIGNED) INTO @LastID FROM FixedDeposit ORDER BY FixedID DESC LIMIT 1 FOR UPDATE;
+    SET @newID = CONCAT("F", LPAD(@LastID + 1 , 6, 0));
+    INSERT INTO FixedDeposit (FixedId, SavingsAccNo, StartingAmount, Duration, StartDate, LastDeptDate) VALUES (@newID, SavingsAccNo, SAmount, Duration, curdate(), NULL);
+    COMMIT;
+END$$
+
+Delimiter ;
+
+DROP PROCEDURE IF EXISTS GetTransactionData;
+DELIMITER //
+CREATE PROCEDURE GetTransactionData(IN BrID varchar(20))
+BEGIN
+    SELECT TransactionID, 
+    FromAccNo AS DebitedAcc, 
+    ToAccNo AS CreditedAcc, 
+    TrnType, Amount,
+    a.BranchID AS DebitedBr,
+    b.BranchID AS CreditedBr
+    FROM transaction t
+    LEFT JOIN account a ON t.FromAccNo = a.AccountNo
+    LEFT JOIN account b ON t.ToAccNo = b.AccountNo
+    WHERE a.BranchID = BrID OR b.BranchID = BrID;    
+END//
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS GetLoanInstallmentData;
+DELIMITER //
+CREATE PROCEDURE GetLoanInstallmentData(IN BrID varchar(20))
+BEGIN
+    SELECT LoanID, CustomerID, PaymentDate, DueDate From 
+    LoanInstallment f 
+    LEFT JOIN loanapplication la
+        ON f.LoanId = la.LoanApplicationID
+    WHERE la.BranchID = BrID AND f.status in ('Pending', 'Overdue');
+            
+END//
+DELIMITER ;

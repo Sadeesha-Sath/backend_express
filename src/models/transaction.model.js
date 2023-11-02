@@ -30,8 +30,8 @@ const addTransaction = async (data) => {
         CALL add_trn(?, ?, ?, ?, ?);
         `,
     values: [
-      data.fromAccNo,
-      data.toAccNo,
+      data.fromAccountNo,
+      data.toAccountNo,
       data.amount,
       data.type,
       data.description,

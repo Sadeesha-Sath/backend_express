@@ -83,7 +83,7 @@ create table Transaction (
     FOREIGN KEY (FromAccNo) references Account(AccountNo),
     CHECK (Amount > 0),
     CHECK (FromAccNo != ToAccNo),
-    CHECK (TrnType = 'ATM' and ToAccNo is null or TrnType != 'ATM' and ToAccNo is not null),
+    CHECK (TrnType in ('ATM', 'TrnFee') and ToAccNo is null or TrnType not in ('ATM', 'TrnFee') and ToAccNo is not null),
     CHECK (TrnType = 'Loan' and FromAccNo is null or TrnType != 'Loan' and FromAccNo is not null)
 );
 
