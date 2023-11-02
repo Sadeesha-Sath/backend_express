@@ -10,5 +10,4 @@ const dbConfig = {
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
 };
-
 module.exports = { dbConfig };

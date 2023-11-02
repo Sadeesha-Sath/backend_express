@@ -57,4 +57,12 @@ const findUserIDfromCustomerID = async (customerID) => {
   return result[0];
 };
 
-module.exports = { findOne, findAll, addCustomer, findUserIDfromCustomerID };
+
+const findCustomerByNIC = async (nic) => {
+  const result = await escapedQuery({
+    sql: `SELECT * FROM CustomerView WHERE NIC_BR=?`,
+    values: [nic],
+  });
+  return result[0];
+};
+module.exports = { findOne, findAll, addCustomer, findUserIDfromCustomerID, findCustomerByNIC };

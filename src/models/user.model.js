@@ -74,10 +74,64 @@ const addUser = async (data) => {
   return result[0];
 };
 
-const findEmployeeIDfromUserID = async (userID) => {
+const findUserIDfromAccount = async (accID) => {
   const result = await escapedQuery({
-    sql: `SELECT EmployeeID from Employee where UserID=?`,
-    values: [userID],
+    sql: `SELECT * FROM AccountView WHERE AccountID=? LIMIT 1`,
+    values: [accID],
+  });
+  console.log(result[0]);
+  return result[0][0];
+};
+
+const findUserIDfromEmployeeID = async (employeeID) => {
+  const result = await escapedQuery({
+    sql: `SELECT UserID from Employee where EmployeeID=?`,
+    values: [employeeID],
+  });
+  console.log(result[0]);
+  return result[0][0];
+};
+
+const findUserIDfromCustomerID = async (customerID) => {
+  const result = await escapedQuery({
+    sql: `SELECT UserID from CustomerView where CustomerID=?`,
+    values: [customerID],
+  });
+  console.log(result[0]);
+  return result[0];
+};
+
+const findUserIDfromTransactionID = async (transactionID) => {
+  const result = await escapedQuery({
+    sql: `SELECT c.UserID from Transaction t inner join Customer c where t.TransactionID=?`,
+    values: [transactionID],
+  });
+  console.log(result[0]);
+  return result[0][0];
+};
+
+const findUserIDfromAccountID = async (accountID) => {
+  const result = await escapedQuery({
+    sql: "SELECT UserID from AccountView WHERE AccountID=?",
+    values: [accountID],
+  });
+  console.log(result[0][0]);
+  return result[0][0];
+};
+
+const findUserIDfromFD = async (FixedID) => {
+  const result = await escapedQuery({
+    sql: "SELECT a.UserID from AccountView a JOIN FixedDeposit f ON f.SavingsAccNo=a.AccountNo WHERE f.FixedId=?",
+    values: [FixedID],
+  });
+  console.log(result[0][0]);
+  return result[0][0];
+};
+
+const findUserIDfromLoan = async (loanID) => {
+  const result = await escapedQuery({
+    sql: "SELECT c.UserID from Loan l JOIN Customer c ON c.CustomerID=l.CustomerID WHERE l.LoanID=?",
+    values: [loanId],
   });
   console.log(result[0][0]);
   return result[0][0];
@@ -92,5 +146,11 @@ module.exports = {
   changePassword,
   findByUsername,
   addUser,
-  findEmployeeIDfromUserID,
+  findUserIDfromAccount,
+  findUserIDfromEmployeeID,
+  findUserIDfromCustomerID,
+  findUserIDfromTransactionID,
+  findUserIDfromAccountID,
+  findUserIDfromFD,
+  findUserIDfromLoan,
 };

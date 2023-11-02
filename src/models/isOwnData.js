@@ -1,9 +1,12 @@
-const { findUserIDfromCustomerID } = require("@models/customer.model.js");
+const { findBranchIDfromEmployeeID } = require("@models/employee.model.js");
 const {
   findUserIDfromEmployeeID,
-  findBranchIDfromEmployeeID,
-} = require("./employee.model.js");
-const { findUserIDfromTransactionID } = require("./transaction.model.js");
+  findUserIDfromCustomerID,
+  findUserIDfromTransactionID,
+  findUserIDfromAccountID,
+  findUserIDfromFD,
+  findUserIDfromLoan,
+} = require("@models/user.model.js");
 
 const isOwnUser = async (id, userID) => {
   return id === userID;
@@ -19,21 +22,37 @@ const isOwnEmployee = async (employeeID, userID) => {
   return userIDfromEmployeeID.userID === userID;
 };
 
-const isOwnAccount = async (accID, userID) => {
-  const userIDfromTrnID = await findUserIDfromTransactionID(accID);
+const isOwnTransaction = async (tranID, userID) => {
+  const userIDfromTrnID = await findUserIDfromTransactionID(tranID);
   return userIDfromTrnID.userID === userID;
+};
+
+const isOwnAccount = async (accID, userID) => {
+  const userIDfromAccID = await findUserIDfromAccountID(accID);
+  return userIDfromAccID.userID === userID;
 };
 
 const getBranchfromEmployeeID = async (employeeID) => {
   return await findBranchIDfromEmployeeID(employeeID);
 };
 
-const getBranchfromUserID = async (userID) => {
-  const employeeID = await findEmployeeIDfromUserID(userID);
-  if (!employeeID) {
-    return null;
-  }
-  return await getBranchfromEmployeeID(employeeID);
+const isOwnFD = async (fixedID, userID) => {
+  const userIDfromFD = await findUserIDfromFD(fixedID);
+  return userIDfromFD === userID;
 };
 
-module.exports = { isOwnCustomer, isOwnAccount, isOwnEmployee, isOwnUser };
+const isOwnLoan = async (loanID, userID) => {
+  const userIDfromLoan = await findUserIDfromLoanID(loanID);
+  return userIDfromLoan === userID;
+};
+
+module.exports = {
+  isOwnCustomer,
+  isOwnTransaction,
+  isOwnEmployee,
+  isOwnUser,
+  isOwnAccount,
+  getBranchfromEmployeeID,
+  isOwnFD,
+  isOwnLoan,
+};

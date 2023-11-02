@@ -9,8 +9,6 @@ app.use(express.urlencoded({ extended: true }));
 
 require("dotenv").config();
 
-const db = require("./src/services/db.service");
-
 // Routes
 
 const verifyToken = require("@middlewares/verifyToken");
@@ -21,6 +19,22 @@ app.use("/transactions", verifyToken, require("@routes/transaction.routes"));
 app.use("/users", verifyToken, require("@routes/user.routes"));
 app.use("/accounts", verifyToken, require("@routes/account.routes"));
 app.use("/branches", verifyToken, require("@routes/branch.routes.js"));
+app.use("/loans", verifyToken, require("@routes/loan.routes.js"));
+app.use(
+  "/fixed-deposits",
+  verifyToken,
+  require("@routes/fixed-deposit.routes")
+);
+app.use(
+  "/loanApplications",
+  verifyToken,
+  require("@routes/loanApplication.routes")
+);
+app.use("/installments", verifyToken, require("@routes/installment.routes"));
+app.use("/interest", verifyToken, require("@routes/interest.routes"));
+
+//verifying token must be fixed
+app.use("/report", verifyToken, require("./src/routes/reports.routes"));
 
 app.get("/", (req, res) => {
   res.send("Hello World");

@@ -1,16 +1,33 @@
 const { query, escapedQuery } = require("@services/db.service.js");
 
 const findAll = async (BranchID) => {
-  let result;
   if (BranchID) {
-    result = await escapedQuery({
+    const result = await escapedQuery({
       sql: `SELECT * from LoanApplication where BranchID=?`,
       values: [BranchID],
     });
+    console.log(result);
+    return result[0];
+  } else {
+    result = await query("SELECT * from LoanApplication");
+    console.log(result);
+    return result[0];
   }
-  result = await query("SELECT * from LoanApplication");
-  console.log(result);
-  return result[0];
+};
+
+const findAllPending = async (branchID) => {
+  if (branchID) {
+    const result = await escapedQuery({
+      sql: "SELECT * FROM pendingloanapplicationsview where BranchID=?",
+      values: [branchID],
+    });
+    console.log(result);
+    return result[0];
+  } else {
+    result = await query("SELECT * from pendingloanapplicationsview");
+    console.log(result);
+    return result[0];
+  }
 };
 
 const findOne = async (id) => {
@@ -89,4 +106,5 @@ module.exports = {
   rejectLoanApplication,
   addOnlineLoanApplication,
   addOfflineLoanApplication,
+  findAllPending,
 };

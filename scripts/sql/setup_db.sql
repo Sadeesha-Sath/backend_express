@@ -26,7 +26,6 @@ create table Employee (
     EmployeeID int NOT NULL auto_increment,
     BranchID int NOT NULL,
     UserID int NOT NULL,
-    Position varchar(30) check (Position in ('Branch_Manager', 'Other')),
     IsManager BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (EmployeeID),
     FOREIGN KEY (BranchID) references Branch(BranchID),
@@ -35,7 +34,7 @@ create table Employee (
 
 create table Customer (
     CustomerID int NOT NULL auto_increment,
-    NIC_BR varchar(30),
+    NIC_BR varchar(30) UNIQUE NOT NULL,
     DOB date,
     Address varchar(255),
     Phone varchar(15),
@@ -84,10 +83,15 @@ create table Transaction (
     FOREIGN KEY (FromAccNo) references Account(AccountNo),
     CHECK (Amount > 0),
     CHECK (FromAccNo != ToAccNo),
-    CHECK (TrnType = 'ATM' and ToAccNo is null or TrnType != 'ATM' and ToAccNo is not null),
+    CHECK (TrnType in ('ATM', 'TrnFee') and ToAccNo is null or TrnType not in ('ATM', 'TrnFee') and ToAccNo is not null),
     CHECK (TrnType = 'Loan' and FromAccNo is null or TrnType != 'Loan' and FromAccNo is not null)
 );
 
+CREATE TABLE FixedDepositInterestRate (
+  Duration decimal(2) NOT NULL check (Duration in (6, 12, 36)),
+  InterestRate decimal(5,2),
+  PRIMARY KEY (Duration)
+);
 
 CREATE TABLE FixedDeposit (
   FixedId varchar(20) NOT NULL,
@@ -96,9 +100,9 @@ CREATE TABLE FixedDeposit (
   Duration decimal(2) check (Duration in (6, 12, 18)),
   StartDate date,
   LastDeptDate date,
-  InterestRate decimal(5,2),
   PRIMARY KEY (FixedId),
-  FOREIGN KEY (SavingsAccNo) REFERENCES Account(accountNo)
+  FOREIGN KEY (SavingsAccNo) REFERENCES Account(accountNo),
+  FOREIGN KEY (Duration) REFERENCES FixedDepositInterestRate(Duration)
 );
 
 
@@ -163,8 +167,3 @@ CREATE TABLE LoanInstallment (
   FOREIGN KEY (LoanID) REFERENCES Loan(LoanID)
 );
 
-CREATE TABLE FixedDepositInterestRate (
-  Duration decimal(2) NOT NULL check (Duration in (6, 12, 36)),
-  InterestRate decimal(5,2),
-  PRIMARY KEY (Duration)
-);
