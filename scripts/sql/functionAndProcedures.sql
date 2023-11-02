@@ -55,15 +55,15 @@ DROP PROCEDURE IF EXISTS approve_loan$$
 create PROCEDURE approve_loan (in loanApplicationID int, in userID int)
 BEGIN
 	START TRANSACTION;
-    SELECT customerID, Amount, Duration, Type INTO @customerID, @Amount, @Duration, @Type FROM LoanApplication WHERE LoanApplicationID = loanApplicationID LIMIT 1 FOR UPDATE;
+    SELECT CustomerID, Amount, Duration, Type INTO @customerID, @Amount, @Duration, @Type FROM LoanApplication WHERE LoanApplicationID = loanApplicationID LIMIT 1 FOR UPDATE;
     SELECT InterestRate INTO @InterestRate FROM LoanInterestRate WHERE Duration = @Duration AND Type = @Type LIMIT 1;
     SELECT EmployeeID INTO @EmployeeID FROM ManagerView WHERE UserID = userID LIMIT 1;
     SET @CurrDate = CURDATE();
     UPDATE LoanApplication SET 
-        status = 'Approved',
+        Status = 'Approved',
         CheckedDate = @CurrDate,
         CheckedBy = @EmployeeID
-        WHERE LoanInApplicationID = loanApplicationID;
+        WHERE LoanApplicationID = loanApplicationID;
     INSERT INTO Loan (LoanID, CustomerID, LoanApplicationID, Amount, Balance, StartDate, EndDate, Installment) 
         VALUES (
             NULL, 
@@ -83,11 +83,10 @@ Delimiter $$
 DROP PROCEDURE IF EXISTS reject_loan$$
 CREATE PROCEDURE reject_loan (in loanApplicationID int, in userID int)
 BEGIN
-DECLARE EXIT HANDLER FOR SQLEXCEPTION
 	START TRANSACTION;
-    SELECT EmployeeID AS EmployeeID INTO @EmployeeID FROM ManagerView WHERE UserID = userID;
+    SELECT EmployeeID  INTO @EmployeeID FROM ManagerView WHERE UserID = userID;
     UPDATE LoanApplication SET 
-        status = 'Rejected',
+        Status = 'Rejected',
         CheckedDate = CURDATE(),
         CheckedBy = @EmployeeID
         WHERE LoanApplicationID = loanApplicationID;
@@ -127,6 +126,7 @@ BEGIN
     -- Check if the amount is greater than 500000 or 60% of the fixed deposit amount
     SELECT StartingAmount INTO @StartingAmount FROM FixedDeposit WHERE FixedId = FixedId LIMIT 1 FOR UPDATE;
     IF amount > 500000 OR amount > (@StartingAmount * 0.6) THEN
+		SET @ERRORAM = 1;
         -- Insert the rejected LoanApplication Entry
         INSERT INTO LoanApplication (LoanApplicationID, IsOnline, FixedId, CustomerID, BranchID, Duration, Type, Amount, Status) 
         VALUES (
@@ -139,7 +139,6 @@ BEGIN
             type, 
             amount, 
             'Rejected');
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Amount Exceeds Limit, Loan Rejected';
     ELSE
         SELECT InterestRate INTO @InterestRate FROM LoanInterestRate WHERE Duration = duration AND Type = type LIMIT 1;
         SET @CurDate = CURDATE();
@@ -156,7 +155,7 @@ BEGIN
                 amount, 
                 'Approved');
         -- Create the Loan Directly
-        INSERT INTO Loan (LoanID, CustomerID, LoanApplicationID, Amount, Balance, StartDate, EndDate, Installment, IsOnline) 
+        INSERT INTO Loan (LoanID, CustomerID, LoanApplicationID, Amount, Balance, StartDate, EndDate, Installment, IsOnline, FixedId) 
             VALUES (
                 NULL, 
                 @CustomerID, 
@@ -166,14 +165,19 @@ BEGIN
                 @CurDate, 
                 @CurDate + INTERVAL duration MONTH,
                 (amount +  (amount * @InterestRate * duration / 12 ))/ duration,
-                1);
+                1, 
+                FixedId
+                );
         SET @LoanID = LAST_INSERT_ID();
         -- Add Funds to the Savings Account Connected to the Fixed Deposit
         SELECT SavingsAccNo INTO @SavingsAccNo FROM FixedDeposit WHERE FixedId = FixedId LIMIT 1 FOR UPDATE;
-        CALL add_trn(NULL, @SavingsAccNo, amount, 'Loan', 'Credited Loan Amount for LoanID: ' + @LoanID);
+        CALL add_trn(NULL, @SavingsAccNo, amount, 'Loan', CONCAT('Credited Loan Amount for LoanID: ', @LoanID));
         SELECT @LoanID;
     END IF;
     COMMIT;
+    IF @ERRORAM = 1 THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =  'Amount Exceeds Limit, Loan Rejected';
+	END IF;
 END$$
 
 DELIMITER $$
@@ -247,33 +251,3 @@ BEGIN
 END$$
 
 Delimiter ;
-
-DROP PROCEDURE IF EXISTS GetTransactionData;
-DELIMITER //
-CREATE PROCEDURE GetTransactionData(IN BrID varchar(20))
-BEGIN
-    SELECT TransactionID, 
-    FromAccNo AS DebitedAcc, 
-    ToAccNo AS CreditedAcc, 
-    TrnType, Amount,
-    a.BranchID AS DebitedBr,
-    b.BranchID AS CreditedBr
-    FROM transaction t
-    LEFT JOIN account a ON t.FromAccNo = a.AccountNo
-    LEFT JOIN account b ON t.ToAccNo = b.AccountNo
-    WHERE a.BranchID = BrID OR b.BranchID = BrID;    
-END//
-DELIMITER ;
-
-DROP PROCEDURE IF EXISTS GetLoanInstallmentData;
-DELIMITER //
-CREATE PROCEDURE GetLoanInstallmentData(IN BrID varchar(20))
-BEGIN
-    SELECT LoanID, CustomerID, PaymentDate, DueDate From 
-    LoanInstallment f 
-    LEFT JOIN loanapplication la
-        ON f.LoanId = la.LoanApplicationID
-    WHERE la.BranchID = BrID AND f.status in ('Pending', 'Overdue');
-            
-END//
-DELIMITER ;

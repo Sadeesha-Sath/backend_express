@@ -2,8 +2,8 @@ const { query, escapedQuery } = require("@services/db.service.js");
 
 const findOwn = async (userID) => {
   const result = await escapedQuery({
-    sql: `SELECT * from TransactionView where UserID=?`,
-    values: [userID],
+    sql: `SELECT * from TransactionView where CreditedUser=? OR DebitedUser=?`,
+    values: [userID, userID],
   });
   console.log(result);
   return result[0];

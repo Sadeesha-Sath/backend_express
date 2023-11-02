@@ -34,7 +34,7 @@ app.use("/installments", verifyToken, require("@routes/installment.routes"));
 app.use("/interest", verifyToken, require("@routes/interest.routes"));
 
 //verifying token must be fixed
-app.use("/report", verifyToken, require("./src/routes/reports.routes"));
+app.use("/reports", verifyToken, require("@routes/reports.routes"));
 
 app.get("/", (req, res) => {
   res.send("Hello World");

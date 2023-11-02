@@ -85,5 +85,8 @@ SELECT a.AccountNo as AccountNo, a.Balance as Balance, a.CustomerID as CustomerI
     
 DROP VIEW IF EXISTS TransactionView;
 CREATE VIEW TransactionView AS
-(SELECT * FROM Transaction t LEFT JOIN AccountView a on t.FromAccNo=a.AccountNo) 
-UNION (SELECT * FROM Transaction t LEFT JOIN AccountView a on t.ToAccNo=a.AccountNo);
+SELECT t.*, a.UserID as CreditedUser, a.BranchID as CreditedBranchID, c.BranchName as CreditedBranchName, 
+b.BranchID as DebitedBranchID, d.BranchName as DebitedBranchName, b.UserID as DebitedUser 
+FROM Transaction t LEFT JOIN AccountView a on t.FromAccNo=a.AccountNo 
+LEFT JOIN AccountView b ON t.ToAccNo=b.AccountNo LEFT JOIN Branch c ON c.BranchID=a.BranchID 
+LEFT JOIN Branch d ON d.BranchID=b.BranchID;

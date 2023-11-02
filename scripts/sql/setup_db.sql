@@ -126,11 +126,12 @@ CREATE TABLE LoanApplication (
   FOREIGN KEY (CheckedBy) REFERENCES Employee(EmployeeID),
   FOREIGN KEY (FixedId) REFERENCES FixedDeposit(FixedId),
   FOREIGN KEY (CreatedBy) REFERENCES Employee(EmployeeID),
-  CHECK ((ISOnline = 1 and CreatedBy is NULL and CheckedBy is NULL )OR (IsOnline = 0 and CreatedBy is not null)),
   CHECK ((Status = 'Pending' and CheckedBy is null) or Status != 'Pending' ),
   check ((IsOnline = 1 and FixedId is not null) or (IsOnline = 0 and FixedId is null)),
   CHECK ((isOnline = 1 and Status != 'Pending') or (isOnline =0))
 );
+
+
 
 
 CREATE TABLE Loan (
@@ -148,7 +149,7 @@ CREATE TABLE Loan (
   FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
   FOREIGN KEY (LoanApplicationID) REFERENCES LoanApplication(LoanApplicationID),
   FOREIGN KEY (FixedId) REFERENCES FixedDeposit(FixedId),
-  check (IsOnline = 1 and FixedId is not null or IsOnline = 0 and FixedId is null)
+  check ((IsOnline = 1 and FixedId is not null) or (IsOnline = 0 and FixedId is null))
 );
 
 CREATE TABLE LoanInterestRate (

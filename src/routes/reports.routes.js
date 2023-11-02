@@ -7,12 +7,12 @@ const router = express.Router();
 router.get("/view", async (req, res) => {
   if (permissionCheck("REPORTS_VIEW", req.user)) {
     try {
-      const branchId = req.query?.branchId;
+      const branchId = req.query?.branchID;
       const reportType = req.query?.reportType;
       const views = await getView(branchId, reportType);
-      res.json(views);
+      res.status(200).send(views);
     } catch (err) {
-      res.status(500).send("Unable to fetch data");
+      res.status(500).send({ message: "Unable to fetch data" });
     }
   } else {
     res
