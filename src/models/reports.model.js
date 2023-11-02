@@ -15,7 +15,7 @@ const getView = async (branchId, reportType) => {
   } else {
     console.log("Error");
   }
-
+  console.log(response);
   return response[0];
 };
 

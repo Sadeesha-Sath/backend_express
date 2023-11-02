@@ -12,10 +12,20 @@ const {
 } = require("@models/loanApplications.model.js");
 const permissionCheck = require("@utils/permissionCheck");
 const { getBranchfromUserID } = require("@models/branch.model");
+const { findOwn } = require("../models/loanApplications.model");
 
 // GET all loan applications
 router.get("/", (req, res) => {
-  if (permissionCheck("ALL_LOAN_APPLICATIONS", req.user)) {
+  if (permissionCheck("MY_LOAN_APPLICATIONS", req.user)) {
+    findOwn(req.user.UserID)
+      .then((result) => {
+        res.status(200).send(result);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err);
+      });
+  } else if (permissionCheck("ALL_LOAN_APPLICATIONS", req.user)) {
     findAll(req.query.branchID)
       .then((result) => {
         res.status(200).send(result);
@@ -26,6 +36,7 @@ router.get("/", (req, res) => {
       });
   } else if (req.query.branchID) {
     getBranchfromUserID(req.user.UserID).then((result) => {
+      console.log(result);
       if (!result) {
         res.status(403).send({
           message: "You need to be an employee to view the applications",
@@ -34,7 +45,7 @@ router.get("/", (req, res) => {
       }
       if (
         permissionCheck("BRANCH_LOAN_APPLICATIONS", req.user) &&
-        result.BranchID === req.query.branchID
+        result.BranchID == req.query.branchID
       ) {
         findAll(req.query.branchID)
           .then((result) => {
@@ -76,7 +87,7 @@ router.get("/pending", (req, res) => {
       }
       if (
         permissionCheck("BRANCH_LOAN_APPLICATIONS", req.user) &&
-        result.BranchID === req.query.branchID
+        result.BranchID == req.query.branchID
       ) {
         findAllPending(req.query.branchID)
           .then((result) => {
@@ -100,6 +111,7 @@ router.get("/pending", (req, res) => {
 
 // POST create a new loan application
 router.post("/new", (req, res) => {
+  console.log(req.body);
   if (req.body.isOnline === true) {
     if (permissionCheck("ADD_ONLINE_LOAN_APPLICATION", req.user)) {
       addOnlineLoanApplication(req.body, req.user.UserID)
@@ -113,18 +125,19 @@ router.post("/new", (req, res) => {
     } else {
       res.status(403).send({ message: "You don't have necessary permissions" });
     }
-  }
-  if (permissionCheck("ADD_OFFLINE_LOAN_APPLICATION", req.user)) {
-    addOfflineLoanApplication(req.body, req.user.UserID)
-      .then((result) => {
-        res.status(200).send(result);
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send(err);
-      });
   } else {
-    res.status(403).send({ message: "You don't have necessary permissions" });
+    if (permissionCheck("ADD_OFFLINE_LOAN_APPLICATION", req.user)) {
+      addOfflineLoanApplication(req.body, req.user.UserID)
+        .then((result) => {
+          res.status(200).send(result);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).send(err);
+        });
+    } else {
+      res.status(403).send({ message: "You don't have necessary permissions" });
+    }
   }
 });
 
@@ -177,7 +190,8 @@ router.post("/approve", (req, res) => {
         return;
       }
       getBranchfromUserID(req.user.UserID).then((userRes) => {
-        if (result.branchID != userRes.branchID) {
+        if (result.BranchID == userRes.BranchID) {
+          console.log("Here");
           approveLoanApplication(req.body?.id, req.user.UserID)
             .then((result) => {
               res.status(200).send(result);
@@ -207,7 +221,8 @@ router.post("/reject", (req, res) => {
         return;
       }
       getBranchfromUserID(req.user.UserID).then((userRes) => {
-        if (result.branchID != userRes.branchID) {
+        if (result.BranchID == userRes.BranchID) {
+          console.log("Here");
           rejectLoanApplication(req.body?.id, req.user.UserID)
             .then((result) => {
               res.status(200).send(result);

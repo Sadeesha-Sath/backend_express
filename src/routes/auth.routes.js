@@ -45,7 +45,7 @@ router.post("/checkUsername", async (req, res) => {
     try {
       const user = await findByUsername(req.body.username);
       const isAvailable = Boolean(
-        (Array.isArray(user) && user.length !== 0) ||
+        (Array.isArray(user) && user.length === 0) ||
           (!Array.isArray(user) && !user)
       );
       res.status(200).send({
@@ -63,16 +63,19 @@ router.post("/checkUsername", async (req, res) => {
 router.post("/checkNic", async (req, res) => {
   if (req.body.nic) {
     try {
-      const user = await findCustomerByNIC(req.body.nic);
-      //console.log(user);
+      const customer = await findCustomerByNIC(req.body.nic);
+      console.log("Customer");
+      console.log(customer);
       const customerExists = Boolean(
         !(
-          (Array.isArray(user) && user.length !== 0) ||
-          (!Array.isArray(user) && !user)
+          (Array.isArray(customer) && customer.length === 0) ||
+          (!Array.isArray(customer) && !customer)
         )
       );
       res.status(200).send({
         exists: customerExists,
+        userID: customerExists ? customer.UserID : null,
+        customerID: customerExists ? customer.CustomerID : null,
         message: customerExists ? "Customer Exists" : "Customer does not exist",
       });
       console.log(res.message);

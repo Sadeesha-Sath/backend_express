@@ -4,12 +4,11 @@ const permissionCheck = require("../utils/permissionCheck.js");
 const router = express.Router();
 
 //need to be fixed
-router.post("/view", async (req, res) => {
+router.get("/view", async (req, res) => {
   if (permissionCheck("REPORTS_VIEW", req.user)) {
     try {
-      checkout;
-      const branchId = req.body?.brId;
-      const reportType = req.body?.reportType;
+      const branchId = req.query?.branchId;
+      const reportType = req.query?.reportType;
       const views = await getView(branchId, reportType);
       res.json(views);
     } catch (err) {

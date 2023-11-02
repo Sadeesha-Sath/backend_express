@@ -10,7 +10,7 @@ const findOne = async (id) => {
     values: [id],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
 
 const findAll = async () => {
@@ -54,15 +54,20 @@ const findUserIDfromCustomerID = async (customerID) => {
     values: [customerID],
   });
   console.log(result[0]);
-  return result[0];
+  return result[0][0];
 };
-
 
 const findCustomerByNIC = async (nic) => {
   const result = await escapedQuery({
     sql: `SELECT * FROM CustomerView WHERE NIC_BR=?`,
     values: [nic],
   });
-  return result[0];
+  return result[0][0];
 };
-module.exports = { findOne, findAll, addCustomer, findUserIDfromCustomerID, findCustomerByNIC };
+module.exports = {
+  findOne,
+  findAll,
+  addCustomer,
+  findUserIDfromCustomerID,
+  findCustomerByNIC,
+};
